@@ -15,17 +15,39 @@ export async function GET(request) {
   };
 
   return new Promise((resolve) => {
-    const models = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/object` });
+    const common = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/common` });
     
-    models.methodCall('execute_kw', [
-      config.db, 2, config.password, // el '2' es el UID de admin, cámbialo si es distinto
-      'crm.lead', // EJEMPLO: 'helpdesk.ticket' o 'x_operacion_aduanal'
-      'search_read',
-      [[['partner_id', '=', parseInt(partnerId)]]], 
-      { fields: ['name', 'x_pedimento', 'x_estatus', 'x_vencimiento', 'display_name'] }
-    ], (err, docs) => {
-      if (err) return resolve(NextResponse.json({ error: err.message }, { status: 500 }));
-      resolve(NextResponse.json(docs));
+    // Autenticamos dinámicamente para obtener el UID real
+    common.methodCall('authenticate', [config.db, config.username, config.password, {}], (error, uid) => {
+      if (error || !uid) {
+        console.error("Error de Auth en Operations:", error);
+        return resolve(NextResponse.json({ error: 'Auth failed' }, { status: 500 }));
+      }
+
+      const models = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/object` });
+      
+      console.log(`Buscando leads para partner_id: ${partnerId}`);
+
+      models.methodCall('execute_kw', [
+        config.db, uid, config.password,
+        'crm.lead', 
+        'search_read',
+        // Filtramos por partner_id (el ID del cliente)
+        [[['partner_id', '=', parseInt(partnerId)]]], 
+        { 
+          // Usamos campos estándar de Odoo para asegurar que no falle por campos x_ inexistentes
+          fields: ['name', 'stage_id', 'create_date', 'priority', 'display_name'],
+          limit: 20
+        }
+      ], (err, docs) => {
+        if (err) {
+          console.error("Error en execute_kw:", err);
+          return resolve(NextResponse.json({ error: err.message }, { status: 500 }));
+        }
+        
+        console.log(`Operaciones encontradas: ${docs.length}`);
+        resolve(NextResponse.json(docs));
+      });
     });
   });
 }
