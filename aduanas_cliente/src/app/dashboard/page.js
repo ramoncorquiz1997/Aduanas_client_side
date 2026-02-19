@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FileText, AlertOctagon, CheckSquare, Gavel, 
-  Search, Filter, ArrowUpRight, Sun, Moon, Loader2
+  Search, Filter, ArrowUpRight, Sun, Moon, Loader2,
+  LogOut // Importamos el icono de cerrar sesión
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
@@ -30,7 +31,6 @@ export default function DashboardAduanal() {
 
   const fetchOperations = async (partnerId) => {
     try {
-      // Llamamos a un endpoint que crearemos para traer data de Odoo
       const res = await fetch(`/api/operations?partnerId=${partnerId}`);
       const data = await res.json();
       setOps(Array.isArray(data) ? data : []);
@@ -39,6 +39,12 @@ export default function DashboardAduanal() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem('user_session'); // Limpiamos la sesión
+    router.push('/'); // Redirigimos al inicio
   };
 
   if (!mounted) return null;
@@ -54,12 +60,32 @@ export default function DashboardAduanal() {
         </div>
         
         <div className="flex gap-3 items-center">
-          <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          {/* Botón de Tema */}
+          <button 
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+            title="Cambiar tema"
+          >
             {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-blue-600" />}
           </button>
-          <div className="relative">
+
+          {/* Botón de Cerrar Sesión */}
+          <button 
+            onClick={handleLogout}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/30 text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-2"
+            title="Cerrar sesión"
+          >
+            <LogOut size={20} />
+            <span className="text-xs font-black uppercase hidden md:inline">Salir</span>
+          </button>
+
+          <div className="relative ml-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input type="text" placeholder="Buscar operación..." className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-64" />
+            <input 
+              type="text" 
+              placeholder="Buscar operación..." 
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64" 
+            />
           </div>
         </div>
       </header>
@@ -99,16 +125,20 @@ export default function DashboardAduanal() {
                     <td className="p-5">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                        <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{op.stage_id[1]}</span>
+                        <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{op.stage_id ? op.stage_id[1] : 'S/E'}</span>
                       </div>
                     </td>
-                    <td className="p-5 text-sm font-bold text-slate-500 italic">{op.create_date ? new Date(op.create_date).toLocaleDateString() : 'N/A'}</td>
+                    <td className="p-5 text-sm font-bold text-slate-500 italic">
+                      {op.create_date ? new Date(op.create_date).toLocaleDateString() : 'N/A'}
+                    </td>
                     <td className="p-5 text-right">
-                      <button className="p-2 hover:bg-blue-600 hover:text-white rounded-xl transition-all text-slate-400"><ArrowUpRight size={20} /></button>
+                      <button className="p-2 hover:bg-blue-600 hover:text-white rounded-xl transition-all text-slate-400">
+                        <ArrowUpRight size={20} />
+                      </button>
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase italic">No se encontraron operaciones activas.</td></tr>
+                  <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase italic text-sm tracking-widest">No se encontraron operaciones activas.</td></tr>
                 )}
               </tbody>
             </table>
