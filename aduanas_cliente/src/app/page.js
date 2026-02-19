@@ -23,32 +23,34 @@ export default function Login() {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
 
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rfc: rfc.trim().toUpperCase(), password }),
-      });
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rfc: rfc.trim().toUpperCase(), password }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        // Si todo sale bien, mandamos al dashboard
-        router.push('/dashboard');
-      } else {
-        // Si Odoo rechaza o no encuentra el RFC
-        setError(data.error || 'Credenciales incorrectas');
+        if (response.ok) {
+          // --- ESTA LÍNEA ES LA IMPORTANTE ---
+          // Guardamos el ID y Nombre que vienen de Odoo en el navegador
+          localStorage.setItem('user_session', JSON.stringify(data.user));
+          
+          router.push('/dashboard');
+        } else {
+          setError(data.error || 'Credenciales incorrectas');
+        }
+      } catch (err) {
+        setError('Error de conexión con el servidor');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError('Error de conexión con el servidor');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
   if (!mounted) return null;
 
