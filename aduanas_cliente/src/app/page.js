@@ -1,31 +1,53 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Ship, Lock, Mail, Eye, EyeOff, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Ship, Lock, User, Eye, EyeOff, ArrowRight, Sun, Moon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 
 export default function Login() {
+  // Estados para el formulario
+  const [rfc, setRfc] = useState('');
+  const [password, setPassword] = useState('');
+  
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
   
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  // Evita errores de hidratación asegurando que el componente esté montado
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    setTimeout(() => {
+    setError('');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rfc: rfc.trim().toUpperCase(), password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Si todo sale bien, mandamos al dashboard
+        router.push('/dashboard');
+      } else {
+        // Si Odoo rechaza o no encuentra el RFC
+        setError(data.error || 'Credenciales incorrectas');
+      }
+    } catch (err) {
+      setError('Error de conexión con el servidor');
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 1500);
+    }
   };
 
   if (!mounted) return null;
@@ -60,20 +82,29 @@ export default function Login() {
         <div className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-200/60 dark:shadow-none">
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Campo Email */}
+            {/* Mostrar error si existe */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest p-4 rounded-xl text-center">
+                {error}
+              </div>
+            )}
+
+            {/* Campo RFC */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">
-                Identificación de Usuario
+                RFC del Contribuyente
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                  <Mail size={20} />
+                  <User size={20} />
                 </div>
                 <input 
-                  type="email" 
+                  type="text" 
                   required
-                  placeholder="usuario@logistica.com"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold transition-all outline-none text-slate-900 dark:text-white shadow-inner"
+                  value={rfc}
+                  onChange={(e) => setRfc(e.target.value)}
+                  placeholder="XAXX010101000"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold transition-all outline-none text-slate-900 dark:text-white shadow-inner uppercase"
                 />
               </div>
             </div>
@@ -95,6 +126,8 @@ export default function Login() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-12 text-sm font-bold transition-all outline-none text-slate-900 dark:text-white shadow-inner"
                 />
