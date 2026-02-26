@@ -16,6 +16,8 @@ export default function DashboardAduanal() {
   const [user, setUser] = useState(null);
   const [ops, setOps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [documents, setDocuments] = useState([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
 
   const [csfUploading, setCsfUploading] = useState(false);
   const [csfMessage, setCsfMessage] = useState('');
@@ -32,6 +34,7 @@ export default function DashboardAduanal() {
     const userData = JSON.parse(session);
     setUser(userData);
     fetchOperations(userData.id);
+    fetchDocuments(userData.id);
   }, []);
 
   const fetchOperations = async (partnerId) => {
@@ -49,6 +52,20 @@ export default function DashboardAduanal() {
   const handleLogout = () => {
     localStorage.removeItem('user_session');
     router.push('/');
+  };
+
+  const fetchDocuments = async (partnerId) => {
+    try {
+      setDocumentsLoading(true);
+      const res = await fetch(`/api/customer/documents?partnerId=${partnerId}`);
+      const data = await res.json();
+      setDocuments(Array.isArray(data.documents) ? data.documents : []);
+    } catch (err) {
+      console.error('Error cargando documentos');
+      setDocuments([]);
+    } finally {
+      setDocumentsLoading(false);
+    }
   };
 
   const handleCsfUpload = async (selectedFile) => {
@@ -83,6 +100,7 @@ export default function DashboardAduanal() {
       }
 
       setCsfMessage('Archivo subido exitosamente');
+      await fetchDocuments(user.id);
     } catch (error) {
       setCsfError('Error de conexion al subir el CSF');
     } finally {
@@ -148,11 +166,11 @@ export default function DashboardAduanal() {
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800">
             <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
-              Subir CSF al perfil
+              Documentos
             </h3>
           </div>
 
-          <div className="p-6 flex flex-col md:flex-row gap-4 md:items-center">
+          <div className="p-6">
             <input
               type="file"
               ref={csfFileInputRef}
@@ -160,19 +178,46 @@ export default function DashboardAduanal() {
               className="hidden"
             />
 
-            <button
-              type="button"
-              onClick={() => csfFileInputRef.current?.click()}
-              disabled={csfUploading}
-              className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
-                csfUploading
-                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              {csfUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-              {csfUploading ? 'Subiendo...' : 'Subir CSF'}
-            </button>
+            <div className="space-y-4">
+              {documentsLoading ? (
+                <div className="py-6"><Loader2 className="animate-spin text-blue-600" size={18} /></div>
+              ) : (
+                documents.map((doc) => (
+                  <div key={doc.key} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => csfFileInputRef.current?.click()}
+                        disabled={csfUploading}
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
+                          csfUploading
+                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        {csfUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                        {csfUploading ? 'Subiendo...' : 'Subir'}
+                      </button>
+
+                      <div>
+                        <p className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">{doc.label}</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                          {doc.filename || 'Sin archivo cargado'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
+                      doc.status === 'cargado'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                    }`}>
+                      {doc.status === 'cargado' ? 'Cargado' : 'Pendiente faltante'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           {(csfMessage || csfError) && (
