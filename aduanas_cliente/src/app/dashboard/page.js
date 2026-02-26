@@ -149,6 +149,15 @@ export default function DashboardAduanal() {
         </div>
 
         <div className="flex gap-3 items-center">
+          <div className="relative ml-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Buscar operacion..."
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64"
+            />
+          </div>
+
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
@@ -165,15 +174,6 @@ export default function DashboardAduanal() {
             <LogOut size={20} />
             <span className="text-xs font-black uppercase hidden md:inline">Salir</span>
           </button>
-
-          <div className="relative ml-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input
-              type="text"
-              placeholder="Buscar operacion..."
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64"
-            />
-          </div>
         </div>
       </header>
 
