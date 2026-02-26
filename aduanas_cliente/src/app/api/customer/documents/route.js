@@ -1,6 +1,47 @@
 import { NextResponse } from 'next/server';
 const xmlrpc = require('xmlrpc');
 
+const PF_DOCUMENTS = [
+  { key: 'x_pf_programa_fomento', label: 'Programa fomento / certificacion' },
+  { key: 'x_pf_fotos_instalaciones', label: 'Fotografias instalaciones' },
+  { key: 'x_pf_sellos_vucem', label: 'Sellos VUCEM' },
+  { key: 'x_pf_contrato_servicios', label: 'Contrato servicios' },
+  { key: 'x_pf_carta_69b', label: 'Carta 69-B/49 Bis' },
+  { key: 'x_pf_cuestionario_oea_ctpat', label: 'Cuestionarios OEA/CTPAT' },
+  { key: 'x_pf_autorizacion_shipper_export', label: 'Autorizacion Shipper Export' },
+  { key: 'x_pf_convenio_confidencialidad', label: 'Convenio confidencialidad' },
+  { key: 'x_pf_info_atencion_ce', label: 'Info atencion Comercio Exterior' },
+  { key: 'x_pf_opinion_cumplimiento_mensual', label: 'Opinion cumplimiento mensual' },
+  { key: 'x_pf_pantalla_domicilio_localizado', label: 'Pantalla domicilio localizado' },
+];
+
+const PM_DOCUMENTS = [
+  { key: 'x_pm_acta_constitutiva', label: 'Acta constitutiva' },
+  { key: 'x_pm_poder_representante', label: 'Poder representante legal' },
+  { key: 'x_pm_doc_propiedad_posesion', label: 'Documento propiedad/posesion' },
+  { key: 'x_pm_rep_identificacion', label: 'Identificacion representante' },
+  { key: 'x_pm_rep_rfc_csf', label: 'RFC personal representante (CSF)' },
+  { key: 'x_pm_rep_opinion_cumplimiento', label: 'Opinion cumplimiento representante' },
+  { key: 'x_pm_acta_verificacion_domicilio', label: 'Acta verificacion domicilio' },
+  { key: 'x_pm_comprobante_domicilio', label: 'Comprobante domicilio' },
+  { key: 'x_pm_opinion_32d', label: 'Opinion cumplimiento 32-D' },
+  { key: 'x_pm_carta_encomienda', label: 'Carta encomienda' },
+  { key: 'x_pm_acuse_encargo_conferido', label: 'Acuse encargo conferido' },
+  { key: 'x_pm_programa_fomento', label: 'Programa fomento/certificacion' },
+  { key: 'x_pm_sellos_vucem', label: 'Sellos VUCEM' },
+  { key: 'x_pm_fotos_instalaciones', label: 'Fotografias instalaciones' },
+  { key: 'x_pm_contrato_servicios', label: 'Contrato servicios' },
+  { key: 'x_pm_carta_69b', label: 'Carta 69-B' },
+  { key: 'x_pm_cuestionarios_oea_ctpat', label: 'Cuestionarios OEA/CTPAT' },
+  { key: 'x_pm_autorizacion_shipper_export', label: 'Autorizacion Shipper Export' },
+  { key: 'x_pm_convenio_confidencialidad', label: 'Convenio confidencialidad' },
+];
+
+function isMoralPerson(value) {
+  if (value === true || value === 't' || value === 'T' || value === 'true') return true;
+  return false;
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const partnerIdRaw = searchParams.get('partnerId');
@@ -26,6 +67,14 @@ export async function GET(request) {
       }
 
       const models = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/object` });
+      const fields = ['is_company'];
+      PF_DOCUMENTS.forEach((doc) => {
+        fields.push(`${doc.key}_file`, `${doc.key}_filename`);
+      });
+      PM_DOCUMENTS.forEach((doc) => {
+        fields.push(`${doc.key}_file`, `${doc.key}_filename`);
+      });
+
       models.methodCall('execute_kw', [
         config.db,
         uid,
@@ -33,26 +82,36 @@ export async function GET(request) {
         'res.partner',
         'read',
         [[partnerId]],
-        { fields: ['x_csf_file', 'x_csf_filename'] },
+        { fields },
       ], (readError, partners) => {
         if (readError || !Array.isArray(partners) || partners.length === 0) {
           return resolve(NextResponse.json({ error: 'No se pudo leer documentos del cliente' }, { status: 500 }));
         }
 
         const partner = partners[0];
-        const hasCsf = Boolean(partner.x_csf_file);
-        const csfFileName = partner.x_csf_filename || '';
+        const personType = isMoralPerson(partner.is_company) ? 'moral' : 'fisica';
+        const sourceDocs = personType === 'moral' ? PM_DOCUMENTS : PF_DOCUMENTS;
 
-        return resolve(NextResponse.json({
-          documents: [
-            {
-              key: 'csf',
-              label: 'CSF',
-              status: hasCsf ? 'cargado' : 'pendiente_faltante',
-              filename: hasCsf ? (csfFileName || 'Archivo sin nombre') : '',
-            },
-          ],
-        }));
+        const documents = sourceDocs.map((doc) => {
+          const fileField = `${doc.key}_file`;
+          const filenameField = `${doc.key}_filename`;
+          const hasFile = Boolean(partner[fileField]);
+          return {
+            key: doc.key,
+            label: doc.label,
+            fileField,
+            filenameField,
+            status: hasFile ? 'cargado' : 'pendiente_faltante',
+            filename: hasFile ? (partner[filenameField] || 'Archivo sin nombre') : '',
+          };
+        }).sort((a, b) => {
+          if (a.status === b.status) return a.label.localeCompare(b.label);
+          return a.status === 'pendiente_faltante' ? -1 : 1;
+        });
+
+        const pendingCount = documents.filter((doc) => doc.status === 'pendiente_faltante').length;
+
+        return resolve(NextResponse.json({ personType, pendingCount, documents }));
       });
     });
   });

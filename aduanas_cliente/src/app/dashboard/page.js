@@ -16,13 +16,17 @@ export default function DashboardAduanal() {
   const [user, setUser] = useState(null);
   const [ops, setOps] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [activeTab, setActiveTab] = useState('principal');
+  const [personType, setPersonType] = useState('');
   const [documents, setDocuments] = useState([]);
   const [documentsLoading, setDocumentsLoading] = useState(true);
-
-  const [csfUploading, setCsfUploading] = useState(false);
-  const [csfMessage, setCsfMessage] = useState('');
-  const [csfError, setCsfError] = useState('');
-  const csfFileInputRef = useRef(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [uploadingDocumentKey, setUploadingDocumentKey] = useState('');
+  const [docMessage, setDocMessage] = useState('');
+  const [docError, setDocError] = useState('');
+  const [selectedDocumentKey, setSelectedDocumentKey] = useState('');
+  const documentInputRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -31,6 +35,7 @@ export default function DashboardAduanal() {
       router.push('/');
       return;
     }
+
     const userData = JSON.parse(session);
     setUser(userData);
     fetchOperations(userData.id);
@@ -49,69 +54,86 @@ export default function DashboardAduanal() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user_session');
-    router.push('/');
-  };
-
   const fetchDocuments = async (partnerId) => {
     try {
       setDocumentsLoading(true);
       const res = await fetch(`/api/customer/documents?partnerId=${partnerId}`);
       const data = await res.json();
       setDocuments(Array.isArray(data.documents) ? data.documents : []);
+      setPendingCount(Number(data.pendingCount || 0));
+      setPersonType(typeof data.personType === 'string' ? data.personType : '');
     } catch (err) {
       console.error('Error cargando documentos');
       setDocuments([]);
+      setPendingCount(0);
+      setPersonType('');
     } finally {
       setDocumentsLoading(false);
     }
   };
 
-  const handleCsfUpload = async (selectedFile) => {
-    setCsfMessage('');
-    setCsfError('');
+  const handleLogout = () => {
+    localStorage.removeItem('user_session');
+    router.push('/');
+  };
+
+  const openFileSelectorForDocument = (documentKey) => {
+    setSelectedDocumentKey(documentKey);
+    documentInputRef.current?.click();
+  };
+
+  const uploadDocument = async (selectedFile, documentKey) => {
+    setDocMessage('');
+    setDocError('');
 
     if (!user?.id) {
-      setCsfError('No se encontro sesion valida del cliente');
+      setDocError('No se encontro sesion valida del cliente');
+      return;
+    }
+
+    if (!documentKey) {
+      setDocError('Documento invalido');
       return;
     }
 
     if (!selectedFile) {
-      setCsfError('Selecciona un archivo CSF');
+      setDocError('Selecciona un archivo');
       return;
     }
 
     try {
-      setCsfUploading(true);
+      setUploadingDocumentKey(documentKey);
       const formData = new FormData();
       formData.append('partnerId', String(user.id));
+      formData.append('documentKey', documentKey);
       formData.append('file', selectedFile);
 
-      const response = await fetch('/api/customer/upload-csf', {
+      const response = await fetch('/api/customer/upload-document', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
       if (!response.ok) {
-        setCsfError(data.error || 'No se pudo subir el CSF');
+        setDocError(data.error || 'No se pudo subir el documento');
         return;
       }
 
-      setCsfMessage('Archivo subido exitosamente');
+      setDocMessage('Archivo subido exitosamente');
       await fetchDocuments(user.id);
     } catch (error) {
-      setCsfError('Error de conexion al subir el CSF');
+      setDocError('Error de conexion al subir el documento');
     } finally {
-      setCsfUploading(false);
+      setUploadingDocumentKey('');
     }
   };
 
-  const handleCsfFileSelected = async (event) => {
+  const handleDocumentFileSelected = async (event) => {
     const selectedFile = event.target.files?.[0] || null;
+    const documentKey = selectedDocumentKey;
     event.target.value = '';
-    await handleCsfUpload(selectedFile);
+    setSelectedDocumentKey('');
+    await uploadDocument(selectedFile, documentKey);
   };
 
   if (!mounted) return null;
@@ -156,128 +178,173 @@ export default function DashboardAduanal() {
       </header>
 
       <main className="max-w-7xl mx-auto space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard icon={<FileText className="text-blue-600" />} label="Total Trafico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
-          <StatCard icon={<Gavel className="text-amber-500" />} label="Pagados" value="--" sub="Sincronizando..." />
-          <StatCard icon={<AlertOctagon className="text-red-500" />} label="Rojos" value="--" sub="Reconocimiento" />
-          <StatCard icon={<CheckSquare className="text-emerald-500" />} label="Concluidos" value="--" sub="Historico" />
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 inline-flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('principal')}
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              activeTab === 'principal'
+                ? 'bg-blue-600 text-white'
+                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            Principal
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('documentacion')}
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              activeTab === 'documentacion'
+                ? 'bg-blue-600 text-white'
+                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            Documentacion
+          </button>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
-              Documentos
-            </h3>
-          </div>
+        {activeTab === 'principal' && (
+          <>
+            {pendingCount > 0 && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">
+                  Documentos pendientes, favor de verificar
+                </p>
+              </div>
+            )}
 
-          <div className="p-6">
-            <input
-              type="file"
-              ref={csfFileInputRef}
-              onChange={handleCsfFileSelected}
-              className="hidden"
-            />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <StatCard icon={<FileText className="text-blue-600" />} label="Total Trafico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
+              <StatCard icon={<Gavel className="text-amber-500" />} label="Pagados" value="--" sub="Sincronizando..." />
+              <StatCard icon={<AlertOctagon className="text-red-500" />} label="Rojos" value="--" sub="Reconocimiento" />
+              <StatCard icon={<CheckSquare className="text-emerald-500" />} label="Concluidos" value="--" sub="Historico" />
+            </div>
 
-            <div className="space-y-4">
-              {documentsLoading ? (
-                <div className="py-6"><Loader2 className="animate-spin text-blue-600" size={18} /></div>
-              ) : (
-                documents.map((doc) => (
-                  <div key={doc.key} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => csfFileInputRef.current?.click()}
-                        disabled={csfUploading}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
-                          csfUploading
-                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {csfUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                        {csfUploading ? 'Subiendo...' : 'Subir'}
-                      </button>
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">Trafico de {user?.name}</h3>
+              </div>
 
-                      <div>
-                        <p className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">{doc.label}</p>
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                          {doc.filename || 'Sin archivo cargado'}
-                        </p>
-                      </div>
-                    </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50/50 dark:bg-slate-800/50">
+                    <tr>
+                      <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Referencia</th>
+                      <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Estatus</th>
+                      <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vencimiento</th>
+                      <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Detalle</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {loading ? (
+                      <tr><td colSpan="4" className="p-10 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" /></td></tr>
+                    ) : ops.length > 0 ? ops.map((op) => (
+                      <tr key={op.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="p-5">
+                          <div className="font-black text-blue-600 text-sm">{op.display_name}</div>
+                          <div className="text-[10px] font-bold text-slate-400 uppercase">{op.priority === '3' ? 'URGENTE' : 'NORMAL'}</div>
+                        </td>
+                        <td className="p-5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{op.stage_id ? op.stage_id[1] : 'S/E'}</span>
+                          </div>
+                        </td>
+                        <td className="p-5 text-sm font-bold text-slate-500 italic">
+                          {op.create_date ? new Date(op.create_date).toLocaleDateString() : 'N/A'}
+                        </td>
+                        <td className="p-5 text-right">
+                          <button className="p-2 hover:bg-blue-600 hover:text-white rounded-xl transition-all text-slate-400">
+                            <ArrowUpRight size={20} />
+                          </button>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase italic text-sm tracking-widest">No se encontraron operaciones activas.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
 
-                    <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
-                      doc.status === 'cargado'
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                    }`}>
-                      {doc.status === 'cargado' ? 'Cargado' : 'Pendiente faltante'}
-                    </div>
+        {activeTab === 'documentacion' && (
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+              <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
+                Documentacion
+              </h3>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Tipo: {personType === 'moral' ? 'Persona moral' : 'Persona fisica'}
+              </p>
+            </div>
+
+            <div className="p-6">
+              <input
+                type="file"
+                ref={documentInputRef}
+                onChange={handleDocumentFileSelected}
+                className="hidden"
+              />
+
+              <div className="space-y-4">
+                {documentsLoading ? (
+                  <div className="py-8 text-center">
+                    <Loader2 className="animate-spin text-blue-600 mx-auto" size={20} />
                   </div>
-                ))
-              )}
-            </div>
-          </div>
+                ) : documents.length > 0 ? (
+                  documents.map((doc) => (
+                    <div key={doc.key} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => openFileSelectorForDocument(doc.key)}
+                          disabled={uploadingDocumentKey === doc.key}
+                          className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
+                            uploadingDocumentKey === doc.key
+                              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          {uploadingDocumentKey === doc.key ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                          {uploadingDocumentKey === doc.key ? 'Subiendo...' : 'Subir'}
+                        </button>
 
-          {(csfMessage || csfError) && (
-            <div className="px-6 pb-6">
-              {csfMessage && (
-                <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{csfMessage}</p>
-              )}
-              {csfError && (
-                <p className="text-xs font-bold text-red-500 uppercase tracking-wider">{csfError}</p>
-              )}
-            </div>
-          )}
-        </div>
+                        <p className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">{doc.label}</p>
 
-        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">Trafico de {user?.name}</h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50/50 dark:bg-slate-800/50">
-                <tr>
-                  <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Referencia</th>
-                  <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Estatus</th>
-                  <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vencimiento</th>
-                  <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Detalle</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {loading ? (
-                  <tr><td colSpan="4" className="p-10 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" /></td></tr>
-                ) : ops.length > 0 ? ops.map((op) => (
-                  <tr key={op.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="p-5">
-                      <div className="font-black text-blue-600 text-sm">{op.display_name}</div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase">{op.priority === '3' ? 'URGENTE' : 'NORMAL'}</div>
-                    </td>
-                    <td className="p-5">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                        <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{op.stage_id ? op.stage_id[1] : 'S/E'}</span>
+                        <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
+                          doc.status === 'cargado'
+                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                        }`}>
+                          {doc.status === 'cargado' ? 'Cargado' : 'Pendiente faltante'}
+                        </div>
                       </div>
-                    </td>
-                    <td className="p-5 text-sm font-bold text-slate-500 italic">
-                      {op.create_date ? new Date(op.create_date).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="p-5 text-right">
-                      <button className="p-2 hover:bg-blue-600 hover:text-white rounded-xl transition-all text-slate-400">
-                        <ArrowUpRight size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase italic text-sm tracking-widest">No se encontraron operaciones activas.</td></tr>
+
+                      <p className="mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                        {doc.filename || 'Sin archivo cargado'}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">No hay documentos configurados.</p>
                 )}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            {(docMessage || docError) && (
+              <div className="px-6 pb-6">
+                {docMessage && (
+                  <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{docMessage}</p>
+                )}
+                {docError && (
+                  <p className="text-xs font-bold text-red-500 uppercase tracking-wider">{docError}</p>
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
