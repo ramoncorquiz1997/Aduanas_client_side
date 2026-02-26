@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, AlertOctagon, CheckSquare, Gavel, 
-  Search, Filter, ArrowUpRight, Sun, Moon, Loader2,
-  LogOut // Importamos el icono de cerrar sesión
+import {
+  FileText, AlertOctagon, CheckSquare, Gavel,
+  Search, ArrowUpRight, Sun, Moon, Loader2, Upload,
+  LogOut
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,11 @@ export default function DashboardAduanal() {
   const [user, setUser] = useState(null);
   const [ops, setOps] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [blFile, setBlFile] = useState(null);
+  const [blUploading, setBlUploading] = useState(false);
+  const [blMessage, setBlMessage] = useState('');
+  const [blError, setBlError] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -35,16 +40,56 @@ export default function DashboardAduanal() {
       const data = await res.json();
       setOps(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Error cargando operaciones");
+      console.error('Error cargando operaciones');
     } finally {
       setLoading(false);
     }
   };
 
-  // Función para cerrar sesión
   const handleLogout = () => {
-    localStorage.removeItem('user_session'); // Limpiamos la sesión
-    router.push('/'); // Redirigimos al inicio
+    localStorage.removeItem('user_session');
+    router.push('/');
+  };
+
+  const handleBlUpload = async (e) => {
+    e.preventDefault();
+    setBlMessage('');
+    setBlError('');
+
+    if (!user?.id) {
+      setBlError('No se encontro sesion valida del cliente');
+      return;
+    }
+
+    if (!blFile) {
+      setBlError('Selecciona un archivo B/L');
+      return;
+    }
+
+    try {
+      setBlUploading(true);
+      const formData = new FormData();
+      formData.append('partnerId', String(user.id));
+      formData.append('file', blFile);
+
+      const response = await fetch('/api/customer/upload-bl', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setBlError(data.error || 'No se pudo subir el B/L');
+        return;
+      }
+
+      setBlMessage('B/L cargado correctamente al perfil del cliente');
+      setBlFile(null);
+    } catch (error) {
+      setBlError('Error de conexion al subir el B/L');
+    } finally {
+      setBlUploading(false);
+    }
   };
 
   if (!mounted) return null;
@@ -58,22 +103,20 @@ export default function DashboardAduanal() {
             Hola, <span className="italic text-slate-400">{user?.name?.split(' ')[0]}</span>
           </h1>
         </div>
-        
+
         <div className="flex gap-3 items-center">
-          {/* Botón de Tema */}
-          <button 
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
             title="Cambiar tema"
           >
             {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-blue-600" />}
           </button>
 
-          {/* Botón de Cerrar Sesión */}
-          <button 
+          <button
             onClick={handleLogout}
             className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/30 text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-2"
-            title="Cerrar sesión"
+            title="Cerrar sesion"
           >
             <LogOut size={20} />
             <span className="text-xs font-black uppercase hidden md:inline">Salir</span>
@@ -81,10 +124,10 @@ export default function DashboardAduanal() {
 
           <div className="relative ml-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar operación..." 
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64" 
+            <input
+              type="text"
+              placeholder="Buscar operacion..."
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64"
             />
           </div>
         </div>
@@ -92,15 +135,55 @@ export default function DashboardAduanal() {
 
       <main className="max-w-7xl mx-auto space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard icon={<FileText className="text-blue-600"/>} label="Total Tráfico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
-          <StatCard icon={<Gavel className="text-amber-500"/>} label="Pagados" value="--" sub="Sincronizando..." />
-          <StatCard icon={<AlertOctagon className="text-red-500"/>} label="Rojos" value="--" sub="Reconocimiento" />
-          <StatCard icon={<CheckSquare className="text-emerald-500"/>} label="Concluidos" value="--" sub="Histórico" />
+          <StatCard icon={<FileText className="text-blue-600" />} label="Total Trafico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
+          <StatCard icon={<Gavel className="text-amber-500" />} label="Pagados" value="--" sub="Sincronizando..." />
+          <StatCard icon={<AlertOctagon className="text-red-500" />} label="Rojos" value="--" sub="Reconocimiento" />
+          <StatCard icon={<CheckSquare className="text-emerald-500" />} label="Concluidos" value="--" sub="Historico" />
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
+              Subir B/L al perfil
+            </h3>
+          </div>
+
+          <form onSubmit={handleBlUpload} className="p-6 flex flex-col md:flex-row gap-4 md:items-center">
+            <input
+              type="file"
+              onChange={(event) => setBlFile(event.target.files?.[0] || null)}
+              className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-slate-100 dark:file:bg-slate-800 file:text-slate-700 dark:file:text-slate-200 hover:file:bg-slate-200 dark:hover:file:bg-slate-700"
+            />
+
+            <button
+              type="submit"
+              disabled={blUploading}
+              className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+                blUploading
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {blUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+              {blUploading ? 'Subiendo...' : 'Subir B/L'}
+            </button>
+          </form>
+
+          {(blMessage || blError) && (
+            <div className="px-6 pb-6">
+              {blMessage && (
+                <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{blMessage}</p>
+              )}
+              {blError && (
+                <p className="text-xs font-bold text-red-500 uppercase tracking-wider">{blError}</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">Tráfico de {user?.name}</h3>
+            <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">Trafico de {user?.name}</h3>
           </div>
 
           <div className="overflow-x-auto">
