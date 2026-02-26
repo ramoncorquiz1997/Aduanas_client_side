@@ -13,12 +13,12 @@ export async function POST(request) {
     }
 
     if (!file || typeof file.arrayBuffer !== 'function') {
-      return NextResponse.json({ error: 'Archivo BL requerido' }, { status: 400 });
+      return NextResponse.json({ error: 'Archivo CSF requerido' }, { status: 400 });
     }
 
     const originalFileName = typeof file.name === 'string' && file.name.trim()
       ? file.name.trim()
-      : 'bl_sin_nombre';
+      : 'csf_sin_nombre';
 
     const buffer = Buffer.from(await file.arrayBuffer());
     if (!buffer.length) {
@@ -52,7 +52,7 @@ export async function POST(request) {
           [[partnerId], { x_csf_file: fileBase64, x_csf_filename: originalFileName }],
         ], (writeError, writeOk) => {
           if (writeError || !writeOk) {
-            return resolve(NextResponse.json({ error: 'No se pudo guardar el BL en Odoo' }, { status: 500 }));
+            return resolve(NextResponse.json({ error: 'No se pudo guardar el CSF en Odoo' }, { status: 500 }));
           }
 
           return resolve(NextResponse.json({ success: true }));

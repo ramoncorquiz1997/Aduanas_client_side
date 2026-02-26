@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText, AlertOctagon, CheckSquare, Gavel,
   Search, ArrowUpRight, Sun, Moon, Loader2, Upload,
@@ -17,10 +17,10 @@ export default function DashboardAduanal() {
   const [ops, setOps] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [blFile, setBlFile] = useState(null);
-  const [blUploading, setBlUploading] = useState(false);
-  const [blMessage, setBlMessage] = useState('');
-  const [blError, setBlError] = useState('');
+  const [csfUploading, setCsfUploading] = useState(false);
+  const [csfMessage, setCsfMessage] = useState('');
+  const [csfError, setCsfError] = useState('');
+  const csfFileInputRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -51,45 +51,49 @@ export default function DashboardAduanal() {
     router.push('/');
   };
 
-  const handleBlUpload = async (e) => {
-    e.preventDefault();
-    setBlMessage('');
-    setBlError('');
+  const handleCsfUpload = async (selectedFile) => {
+    setCsfMessage('');
+    setCsfError('');
 
     if (!user?.id) {
-      setBlError('No se encontro sesion valida del cliente');
+      setCsfError('No se encontro sesion valida del cliente');
       return;
     }
 
-    if (!blFile) {
-      setBlError('Selecciona un archivo B/L');
+    if (!selectedFile) {
+      setCsfError('Selecciona un archivo CSF');
       return;
     }
 
     try {
-      setBlUploading(true);
+      setCsfUploading(true);
       const formData = new FormData();
       formData.append('partnerId', String(user.id));
-      formData.append('file', blFile);
+      formData.append('file', selectedFile);
 
-      const response = await fetch('/api/customer/upload-bl', {
+      const response = await fetch('/api/customer/upload-csf', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
       if (!response.ok) {
-        setBlError(data.error || 'No se pudo subir el B/L');
+        setCsfError(data.error || 'No se pudo subir el CSF');
         return;
       }
 
-      setBlMessage('B/L cargado correctamente al perfil del cliente');
-      setBlFile(null);
+      setCsfMessage('Archivo subido exitosamente');
     } catch (error) {
-      setBlError('Error de conexion al subir el B/L');
+      setCsfError('Error de conexion al subir el CSF');
     } finally {
-      setBlUploading(false);
+      setCsfUploading(false);
     }
+  };
+
+  const handleCsfFileSelected = async (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    event.target.value = '';
+    await handleCsfUpload(selectedFile);
   };
 
   if (!mounted) return null;
@@ -144,38 +148,40 @@ export default function DashboardAduanal() {
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800">
             <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
-              Subir B/L al perfil
+              Subir CSF al perfil
             </h3>
           </div>
 
-          <form onSubmit={handleBlUpload} className="p-6 flex flex-col md:flex-row gap-4 md:items-center">
+          <div className="p-6 flex flex-col md:flex-row gap-4 md:items-center">
             <input
               type="file"
-              onChange={(event) => setBlFile(event.target.files?.[0] || null)}
-              className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-slate-100 dark:file:bg-slate-800 file:text-slate-700 dark:file:text-slate-200 hover:file:bg-slate-200 dark:hover:file:bg-slate-700"
+              ref={csfFileInputRef}
+              onChange={handleCsfFileSelected}
+              className="hidden"
             />
 
             <button
-              type="submit"
-              disabled={blUploading}
+              type="button"
+              onClick={() => csfFileInputRef.current?.click()}
+              disabled={csfUploading}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
-                blUploading
+                csfUploading
                   ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
-              {blUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-              {blUploading ? 'Subiendo...' : 'Subir B/L'}
+              {csfUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+              {csfUploading ? 'Subiendo...' : 'Subir CSF'}
             </button>
-          </form>
+          </div>
 
-          {(blMessage || blError) && (
+          {(csfMessage || csfError) && (
             <div className="px-6 pb-6">
-              {blMessage && (
-                <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{blMessage}</p>
+              {csfMessage && (
+                <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{csfMessage}</p>
               )}
-              {blError && (
-                <p className="text-xs font-bold text-red-500 uppercase tracking-wider">{blError}</p>
+              {csfError && (
+                <p className="text-xs font-bold text-red-500 uppercase tracking-wider">{csfError}</p>
               )}
             </div>
           )}
