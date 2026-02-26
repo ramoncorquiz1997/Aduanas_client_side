@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "NexusAduana | Gestión Logística",
+  title: "Aduanex | Gestión Logística",
   description: "Sistema profesional de aduanas",
 };
 

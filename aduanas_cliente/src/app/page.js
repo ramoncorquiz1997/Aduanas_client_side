@@ -175,7 +175,7 @@ export default function Login() {
         {/* Footer legal */}
         <div className="mt-8 flex flex-col items-center gap-2">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
-            © 2026 Nexus Customs Technology
+            © 2026 Aduanex. Todos los derechos reservados.
           </p>
           <div className="flex gap-4">
             <span className="text-[9px] font-bold text-slate-400 uppercase">Privacidad</span>
