@@ -5,11 +5,11 @@
 
 :root {
   --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
+  --foreground: #212121;
 }
 
 .dark {
-  --background: #020617; /* slate-950 */
+  --background: #212121;
   --foreground: #f8fafc; /* slate-50 */
 }
 

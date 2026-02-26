@@ -26,6 +26,9 @@ export default function DashboardAduanal() {
   const [docMessage, setDocMessage] = useState('');
   const [docError, setDocError] = useState('');
   const [selectedDocumentKey, setSelectedDocumentKey] = useState('');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
   const documentInputRef = useRef(null);
 
   useEffect(() => {
@@ -136,14 +139,28 @@ export default function DashboardAduanal() {
     await uploadDocument(selectedFile, documentKey);
   };
 
+  const openDocumentPreview = (doc) => {
+    if (!user?.id) return;
+    const url = `/api/customer/document-preview?partnerId=${user.id}&documentKey=${doc.key}`;
+    setPreviewTitle(doc.filename || doc.label);
+    setPreviewUrl(url);
+    setPreviewOpen(true);
+  };
+
+  const closeDocumentPreview = () => {
+    setPreviewOpen(false);
+    setPreviewUrl('');
+    setPreviewTitle('');
+  };
+
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#212121] p-4 lg:p-8 font-sans transition-colors duration-500">
       <header className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] mb-2">RFC: {user?.rfc}</h2>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-xs font-black text-[#3D6332] uppercase tracking-[0.3em] mb-2">RFC: {user?.rfc}</h2>
+          <h1 className="text-4xl font-black text-[#212121] dark:text-white tracking-tight">
             Hola, <span className="italic text-slate-400">{user?.name?.split(' ')[0]}</span>
           </h1>
         </div>
@@ -163,7 +180,7 @@ export default function DashboardAduanal() {
             className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
             title="Cambiar tema"
           >
-            {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-blue-600" />}
+            {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-[#3D6332]" />}
           </button>
 
           <button
@@ -184,7 +201,7 @@ export default function DashboardAduanal() {
             onClick={() => setActiveTab('principal')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
               activeTab === 'principal'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#3D6332] text-white'
                 : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -195,7 +212,7 @@ export default function DashboardAduanal() {
             onClick={() => setActiveTab('documentacion')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
               activeTab === 'documentacion'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#3D6332] text-white'
                 : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -214,7 +231,7 @@ export default function DashboardAduanal() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <StatCard icon={<FileText className="text-blue-600" />} label="Total Trafico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
+              <StatCard icon={<FileText className="text-[#3D6332]" />} label="Total Trafico" value={ops.length.toString().padStart(2, '0')} sub="Operaciones activas" />
               <StatCard icon={<Gavel className="text-amber-500" />} label="Pagados" value="--" sub="Sincronizando..." />
               <StatCard icon={<AlertOctagon className="text-red-500" />} label="Rojos" value="--" sub="Reconocimiento" />
               <StatCard icon={<CheckSquare className="text-emerald-500" />} label="Concluidos" value="--" sub="Historico" />
@@ -237,16 +254,16 @@ export default function DashboardAduanal() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {loading ? (
-                      <tr><td colSpan="4" className="p-10 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" /></td></tr>
+                      <tr><td colSpan="4" className="p-10 text-center"><Loader2 className="animate-spin mx-auto text-[#3D6332]" /></td></tr>
                     ) : ops.length > 0 ? ops.map((op) => (
                       <tr key={op.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
                         <td className="p-5">
-                          <div className="font-black text-blue-600 text-sm">{op.display_name}</div>
+                          <div className="font-black text-[#3D6332] text-sm">{op.display_name}</div>
                           <div className="text-[10px] font-bold text-slate-400 uppercase">{op.priority === '3' ? 'URGENTE' : 'NORMAL'}</div>
                         </td>
                         <td className="p-5">
                           <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            <span className="w-2 h-2 rounded-full bg-[#3D6332] animate-pulse"></span>
                             <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{op.stage_id ? op.stage_id[1] : 'S/E'}</span>
                           </div>
                         </td>
@@ -254,7 +271,7 @@ export default function DashboardAduanal() {
                           {op.create_date ? new Date(op.create_date).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="p-5 text-right">
-                          <button className="p-2 hover:bg-blue-600 hover:text-white rounded-xl transition-all text-slate-400">
+                          <button className="p-2 hover:bg-[#3D6332] hover:text-white rounded-xl transition-all text-slate-400">
                             <ArrowUpRight size={20} />
                           </button>
                         </td>
@@ -291,7 +308,7 @@ export default function DashboardAduanal() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {documentsLoading ? (
                   <div className="py-8 text-center">
-                    <Loader2 className="animate-spin text-blue-600 mx-auto" size={20} />
+                    <Loader2 className="animate-spin text-[#3D6332] mx-auto" size={20} />
                   </div>
                 ) : documents.length > 0 ? (
                   documents.map((doc) => (
@@ -304,12 +321,22 @@ export default function DashboardAduanal() {
                           className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
                             uploadingDocumentKey === doc.key
                               ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                              : 'bg-[#3D6332] text-white hover:bg-[#33542A]'
                           }`}
                         >
                           {uploadingDocumentKey === doc.key ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                           {uploadingDocumentKey === doc.key ? 'Subiendo...' : 'Subir'}
                         </button>
+
+                        {doc.status === 'cargado' && (
+                          <button
+                            type="button"
+                            onClick={() => openDocumentPreview(doc)}
+                            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                          >
+                            Ver
+                          </button>
+                        )}
 
                         <p className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">{doc.label}</p>
 
@@ -343,6 +370,28 @@ export default function DashboardAduanal() {
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {previewOpen && (
+          <div className="fixed inset-0 z-50 bg-[#212121]/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-5xl h-[80vh] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
+              <div className="h-14 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <p className="text-sm font-black text-slate-800 dark:text-slate-100 truncate">{previewTitle}</p>
+                <button
+                  type="button"
+                  onClick={closeDocumentPreview}
+                  className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                >
+                  Cerrar
+                </button>
+              </div>
+              <iframe
+                title="Preview documento"
+                src={previewUrl}
+                className="w-full h-[calc(80vh-56px)] bg-white"
+              />
+            </div>
           </div>
         )}
       </main>

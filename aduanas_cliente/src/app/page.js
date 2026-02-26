@@ -55,25 +55,25 @@ export default function Login() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-500 relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#212121] flex items-center justify-center p-4 font-sans text-[#212121] dark:text-slate-100 transition-colors duration-500 relative">
       
       {/* Botón de Cambio de Tema */}
       <button
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         className="absolute top-6 right-6 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl hover:scale-110 active:scale-95 transition-all text-slate-600 dark:text-slate-400"
       >
-        {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-blue-600" />}
+        {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-[#3D6332]" />}
       </button>
 
       <div className="w-full max-w-md">
         
         {/* Logo y Encabezado */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-3xl text-white shadow-2xl shadow-blue-500/30 mb-6 transform hover:rotate-6 transition-transform">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-[#3D6332] rounded-3xl text-white shadow-2xl shadow-[#3D6332]/30 mb-6 transform hover:rotate-6 transition-transform">
             <Ship size={40} />
           </div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">
-            Aduan<span className="text-blue-600">ex</span>
+          <h1 className="text-4xl font-black text-[#212121] dark:text-white tracking-tighter uppercase italic">
+            Aduan<span className="text-[#3D6332]">ex</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-3 font-bold text-sm uppercase tracking-widest">
             Sistema de Gestión Logística
@@ -97,7 +97,7 @@ export default function Login() {
                 RFC del Contribuyente
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#3D6332] transition-colors">
                   <User size={20} />
                 </div>
                 <input 
@@ -106,7 +106,7 @@ export default function Login() {
                   value={rfc}
                   onChange={(e) => setRfc(e.target.value)}
                   placeholder="XAXX010101000"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold transition-all outline-none text-slate-900 dark:text-white shadow-inner uppercase"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-[#3D6332] focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold transition-all outline-none text-[#212121] dark:text-white shadow-inner uppercase"
                 />
               </div>
             </div>
@@ -117,12 +117,12 @@ export default function Login() {
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                   Clave de Acceso
                 </label>
-                <a href="#" className="text-[10px] font-black text-blue-600 uppercase hover:underline decoration-2 underline-offset-4">
+                <a href="#" className="text-[10px] font-black text-[#3D6332] uppercase hover:underline decoration-2 underline-offset-4">
                   Recuperar
                 </a>
               </div>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#3D6332] transition-colors">
                   <Lock size={20} />
                 </div>
                 <input 
@@ -131,12 +131,12 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-12 text-sm font-bold transition-all outline-none text-slate-900 dark:text-white shadow-inner"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-[#3D6332] focus:bg-white dark:focus:bg-slate-900 rounded-2xl py-4 pl-12 pr-12 text-sm font-bold transition-all outline-none text-[#212121] dark:text-white shadow-inner"
                 />
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-blue-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-[#3D6332] transition-colors"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -150,7 +150,7 @@ export default function Login() {
               className={`w-full group flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl ${
                 isLoading 
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
-                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-500/40 active:scale-[0.97]'
+                : 'bg-[#3D6332] text-white hover:bg-[#33542A] hover:shadow-[#3D6332]/40 active:scale-[0.97]'
               }`}
             >
               {isLoading ? (
@@ -167,7 +167,7 @@ export default function Login() {
           {/* Soporte */}
           <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800">
             <p className="text-[11px] text-slate-500 font-bold text-center uppercase tracking-tighter">
-              ¿Problemas con el acceso? <a href="#" className="text-blue-600 hover:underline">Contactar a TI</a>
+              ¿Problemas con el acceso? <a href="#" className="text-[#3D6332] hover:underline">Contactar a TI</a>
             </p>
           </div>
         </div>
