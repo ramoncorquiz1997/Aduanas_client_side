@@ -288,7 +288,7 @@ export default function DashboardAduanal() {
                 className="hidden"
               />
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {documentsLoading ? (
                   <div className="py-8 text-center">
                     <Loader2 className="animate-spin text-blue-600 mx-auto" size={20} />

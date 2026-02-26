@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 const xmlrpc = require('xmlrpc');
 
 const PF_DOCUMENTS = [
+  { key: 'x_csf', label: 'CSF' },
   { key: 'x_pf_programa_fomento', label: 'Programa fomento / certificacion' },
   { key: 'x_pf_fotos_instalaciones', label: 'Fotografias instalaciones' },
   { key: 'x_pf_sellos_vucem', label: 'Sellos VUCEM' },

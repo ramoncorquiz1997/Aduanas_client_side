@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 const xmlrpc = require('xmlrpc');
 
 const ALLOWED_KEYS = new Set([
+  'x_csf',
   'x_pf_programa_fomento',
   'x_pf_fotos_instalaciones',
   'x_pf_sellos_vucem',
