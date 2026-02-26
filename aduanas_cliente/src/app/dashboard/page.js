@@ -171,13 +171,13 @@ export default function DashboardAduanal() {
             <input
               type="text"
               placeholder="Buscar operacion..."
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64"
+              className="bg-white dark:bg-[#2A2A2A] border border-slate-200 dark:border-[#3A3A3A] rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none dark:text-white shadow-sm w-48 md:w-64"
             />
           </div>
 
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+            className="p-2.5 rounded-xl bg-white dark:bg-[#2A2A2A] border border-slate-200 dark:border-[#3A3A3A] shadow-sm hover:bg-slate-50 dark:hover:bg-[#333333] transition-all"
             title="Cambiar tema"
           >
             {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-[#3D6332]" />}
@@ -185,7 +185,7 @@ export default function DashboardAduanal() {
 
           <button
             onClick={handleLogout}
-            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/30 text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-2"
+            className="p-2.5 rounded-xl bg-white dark:bg-[#2A2A2A] border border-red-100 dark:border-red-900/30 text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center gap-2"
             title="Cerrar sesion"
           >
             <LogOut size={20} />
@@ -195,14 +195,14 @@ export default function DashboardAduanal() {
       </header>
 
       <main className="max-w-7xl mx-auto space-y-8">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 inline-flex gap-2">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl border border-slate-200 dark:border-[#3A3A3A] p-2 inline-flex gap-2">
           <button
             type="button"
             onClick={() => setActiveTab('principal')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
               activeTab === 'principal'
                 ? 'bg-[#3D6332] text-white'
-                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-[#333333]'
             }`}
           >
             Principal
@@ -213,7 +213,7 @@ export default function DashboardAduanal() {
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
               activeTab === 'documentacion'
                 ? 'bg-[#3D6332] text-white'
-                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-[#333333]'
             }`}
           >
             Documentacion
@@ -237,14 +237,14 @@ export default function DashboardAduanal() {
               <StatCard icon={<CheckSquare className="text-emerald-500" />} label="Concluidos" value="--" sub="Historico" />
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <div className="bg-white dark:bg-[#262626] rounded-[2.5rem] border border-slate-200 dark:border-[#3A3A3A] overflow-hidden shadow-sm">
+              <div className="p-6 border-b border-slate-100 dark:border-[#3A3A3A] flex justify-between items-center">
                 <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">Trafico de {user?.name}</h3>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead className="bg-slate-50/50 dark:bg-slate-800/50">
+                  <thead className="bg-slate-50/50 dark:bg-[#303030]/70">
                     <tr>
                       <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Referencia</th>
                       <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Estatus</th>
@@ -252,11 +252,11 @@ export default function DashboardAduanal() {
                       <th className="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Detalle</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-slate-100 dark:divide-[#3A3A3A]">
                     {loading ? (
                       <tr><td colSpan="4" className="p-10 text-center"><Loader2 className="animate-spin mx-auto text-[#3D6332]" /></td></tr>
                     ) : ops.length > 0 ? ops.map((op) => (
-                      <tr key={op.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                      <tr key={op.id} className="hover:bg-slate-50/80 dark:hover:bg-[#303030] transition-colors">
                         <td className="p-5">
                           <div className="font-black text-[#3D6332] text-sm">{op.display_name}</div>
                           <div className="text-[10px] font-bold text-slate-400 uppercase">{op.priority === '3' ? 'URGENTE' : 'NORMAL'}</div>
@@ -287,8 +287,8 @@ export default function DashboardAduanal() {
         )}
 
         {activeTab === 'documentacion' && (
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div className="bg-white dark:bg-[#262626] rounded-[2.5rem] border border-slate-200 dark:border-[#3A3A3A] overflow-hidden shadow-sm">
+            <div className="p-6 border-b border-slate-100 dark:border-[#3A3A3A] flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <h3 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter text-lg">
                 Documentacion
               </h3>
@@ -312,7 +312,7 @@ export default function DashboardAduanal() {
                   </div>
                 ) : documents.length > 0 ? (
                   documents.map((doc) => (
-                    <div key={doc.key} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+                    <div key={doc.key} className="border border-slate-200 dark:border-[#3A3A3A] rounded-2xl p-4 dark:bg-[#242424]">
                       <div className="flex flex-wrap items-center gap-3">
                         <button
                           type="button"
@@ -332,7 +332,7 @@ export default function DashboardAduanal() {
                           <button
                             type="button"
                             onClick={() => openDocumentPreview(doc)}
-                            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#3D6332] text-[#3D6332] dark:text-[#A7D19B] bg-[#3D6332]/10 dark:bg-[#3D6332]/25 hover:bg-[#3D6332] hover:text-white transition-all"
                           >
                             Ver
                           </button>
@@ -375,13 +375,13 @@ export default function DashboardAduanal() {
 
         {previewOpen && (
           <div className="fixed inset-0 z-50 bg-[#212121]/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="w-full max-w-5xl h-[80vh] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
-              <div className="h-14 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div className="w-full max-w-5xl h-[80vh] bg-white dark:bg-[#262626] rounded-2xl border border-slate-200 dark:border-[#3A3A3A] overflow-hidden shadow-2xl">
+              <div className="h-14 px-4 border-b border-slate-200 dark:border-[#3A3A3A] flex items-center justify-between">
                 <p className="text-sm font-black text-slate-800 dark:text-slate-100 truncate">{previewTitle}</p>
                 <button
                   type="button"
                   onClick={closeDocumentPreview}
-                  className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide bg-slate-100 dark:bg-[#333333] text-slate-700 dark:text-slate-200"
                 >
                   Cerrar
                 </button>
@@ -401,8 +401,8 @@ export default function DashboardAduanal() {
 
 function StatCard({ icon, label, value, sub }) {
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4">{icon}</div>
+    <div className="bg-white dark:bg-[#262626] p-6 rounded-3xl border border-slate-200 dark:border-[#3A3A3A] shadow-sm">
+      <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#333333] flex items-center justify-center mb-4">{icon}</div>
       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
       <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-1">{value}</h3>
       <p className="text-[10px] font-bold text-slate-500 uppercase italic">{sub}</p>
