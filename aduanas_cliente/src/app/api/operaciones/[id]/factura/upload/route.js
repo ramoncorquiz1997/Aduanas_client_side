@@ -58,8 +58,9 @@ function executeKw(models, uid, model, method, args, kwargs = {}) {
   });
 }
 
-export async function POST(request, { params }) {
+export async function POST(request, context) {
   try {
+    const params = await context?.params;
     const opId = Number(params?.id);
     if (!opId || Number.isNaN(opId)) {
       return NextResponse.json({ error: 'Operacion invalida' }, { status: 400 });
