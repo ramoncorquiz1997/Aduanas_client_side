@@ -38,6 +38,16 @@ const INITIAL_FACTURA_STATE = {
   sendingOperation: false,
 };
 
+async function readApiResponse(response) {
+  const rawText = await response.text();
+  if (!rawText) return {};
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    return { error: rawText };
+  }
+}
+
 function mapFacturaStatusPayload(payload) {
   const normalizedStatus = normalizeFacturaStatus(payload?.status);
   return {
@@ -227,7 +237,7 @@ export default function DashboardAduanal() {
 
     try {
       const response = await fetchWithRetry(`/api/operaciones/${operationId}/factura/status`);
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) {
         throw new Error(data?.error || 'No se pudo consultar estatus de factura');
       }
@@ -278,7 +288,7 @@ export default function DashboardAduanal() {
           ...cfdiData,
         }),
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) {
         throw new Error(data?.error || 'No se pudo validar CFDI');
       }
@@ -348,7 +358,7 @@ export default function DashboardAduanal() {
         method: 'POST',
         body: formData,
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
 
       if (!response.ok) {
         throw new Error(data?.error || 'No se pudo subir factura');
@@ -408,7 +418,7 @@ export default function DashboardAduanal() {
         method: 'POST',
         body: formData,
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) {
         throw new Error(data?.error || 'No se pudo eliminar archivo');
       }
