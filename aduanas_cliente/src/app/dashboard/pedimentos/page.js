@@ -20,7 +20,7 @@ function StatusBadge({ stage }) {
   const label = stage?.[1] || stage || 'Sin etapa';
   const l = label.toLowerCase();
   const cls = l.includes('ganado')
-    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+    ? 'bg-[#3D6332]/10 text-[#3D6332] border-[#3D6332]/20'
     : l.includes('perdido')
     ? 'bg-red-500/10 text-red-400 border-red-500/20'
     : 'bg-zinc-800 text-zinc-400 border-zinc-700';
@@ -117,8 +117,8 @@ export default function PedimentosPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-            <FileStack size={18} className="text-emerald-400" />
+          <div className="p-2 rounded-lg bg-[#3D6332]/10 border border-[#3D6332]/20">
+            <FileStack size={18} className="text-[#3D6332]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Repositorio de Pedimentos</h1>
@@ -145,7 +145,7 @@ export default function PedimentosPage() {
             placeholder="Buscar por nombre o ID…"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full bg-[#111111] border border-zinc-800 rounded-lg pl-9 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+            className="w-full bg-[#111111] border border-zinc-800 rounded-lg pl-9 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#3D6332]/50 focus:ring-1 focus:ring-[#3D6332]/20 transition-all"
           />
         </div>
 
@@ -155,7 +155,7 @@ export default function PedimentosPage() {
           <select
             value={stageFilter}
             onChange={(e) => { setStageFilter(e.target.value); setPage(1); }}
-            className="bg-[#111111] border border-zinc-800 rounded-lg pl-8 pr-8 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-emerald-500/50 appearance-none cursor-pointer transition-all hover:border-zinc-700"
+            className="bg-[#111111] border border-zinc-800 rounded-lg pl-8 pr-8 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-[#3D6332]/50 appearance-none cursor-pointer transition-all hover:border-zinc-700"
           >
             <option value="">Todas las etapas</option>
             {stages.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -167,7 +167,7 @@ export default function PedimentosPage() {
           <select
             value={priorityFilter}
             onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}
-            className="bg-[#111111] border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-emerald-500/50 appearance-none cursor-pointer transition-all hover:border-zinc-700"
+            className="bg-[#111111] border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-[#3D6332]/50 appearance-none cursor-pointer transition-all hover:border-zinc-700"
           >
             <option value="">Todas las prioridades</option>
             <option value="0">Normal</option>
@@ -198,7 +198,7 @@ export default function PedimentosPage() {
               {hasFilters ? 'Sin resultados para los filtros aplicados' : 'No hay operaciones registradas'}
             </p>
             {hasFilters && (
-              <button onClick={clearFilters} className="text-xs text-emerald-400 hover:underline mt-1">
+              <button onClick={clearFilters} className="text-xs text-[#3D6332] hover:underline mt-1">
                 Limpiar filtros
               </button>
             )}
@@ -238,7 +238,7 @@ export default function PedimentosPage() {
                       <div className="flex items-center gap-2">
                         <button
                           title="Descargar PDF"
-                          className="p-1.5 rounded-md text-zinc-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all"
+                          className="p-1.5 rounded-md text-zinc-500 hover:text-[#3D6332] hover:bg-[#3D6332]/10 transition-all"
                           onClick={() => alert(`Descarga PDF de operación #${op.id} — conectar con endpoint de descarga`)}
                         >
                           <FileDown size={15} />
@@ -283,7 +283,7 @@ export default function PedimentosPage() {
                     onClick={() => setPage(p)}
                     className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
                       p === page
-                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-[#3D6332]/15 text-[#3D6332] border border-[#3D6332]/30'
                         : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
                     }`}
                   >

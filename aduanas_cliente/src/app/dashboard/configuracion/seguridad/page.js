@@ -27,7 +27,7 @@ function PasswordInput({ id, label, value, onChange, show, onToggle, hint }) {
           type={show ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-lg px-4 py-3 pr-11 text-sm text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+          className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-lg px-4 py-3 pr-11 text-sm text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-[#3D6332]/50 focus:ring-1 focus:ring-[#3D6332]/20 transition-all"
           placeholder="••••••••"
           autoComplete="new-password"
         />
@@ -53,8 +53,8 @@ function StrengthBar({ password }) {
   ].filter(Boolean).length;
 
   const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
-  const colors = ['', 'bg-red-500', 'bg-amber-500', 'bg-blue-500', 'bg-emerald-500'];
-  const textColors = ['', 'text-red-400', 'text-amber-400', 'text-blue-400', 'text-emerald-400'];
+  const colors = ['', 'bg-red-500', 'bg-amber-500', 'bg-blue-500', 'bg-[#3D6332]'];
+  const textColors = ['', 'text-red-400', 'text-amber-400', 'text-blue-400', 'text-[#3D6332]'];
 
   if (!password) return null;
 
@@ -170,7 +170,7 @@ export default function SeguridadPage() {
 
       {/* Feedback */}
       {success && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#3D6332]/10 border border-[#3D6332]/20 text-[#3D6332] text-sm">
           <CheckCircle2 size={16} />
           <span>{success}</span>
           <button onClick={() => setSuccess('')} className="ml-auto shrink-0">
@@ -224,7 +224,7 @@ export default function SeguridadPage() {
           />
 
           {confirm && next && (
-            <p className={`text-xs flex items-center gap-1.5 ${next === confirm ? 'text-emerald-400' : 'text-red-400'}`}>
+            <p className={`text-xs flex items-center gap-1.5 ${next === confirm ? 'text-[#3D6332]' : 'text-red-400'}`}>
               {next === confirm
                 ? <><CheckCircle2 size={12} /> Las contraseñas coinciden</>
                 : <><AlertCircle size={12} /> Las contraseñas no coinciden</>
@@ -236,7 +236,7 @@ export default function SeguridadPage() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-500 mt-2"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#3D6332] hover:bg-[#33542A] text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#3D6332] mt-2"
         >
           {loading ? (
             <><Loader2 size={15} className="animate-spin" /> Guardando…</>

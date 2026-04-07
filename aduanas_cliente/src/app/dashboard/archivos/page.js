@@ -17,7 +17,7 @@ import {
 
 function StatusBadge({ status }) {
   const map = {
-    cargado: ['Cargado', 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'],
+    cargado: ['Cargado', 'bg-[#3D6332]/10 text-[#3D6332] border-[#3D6332]/20'],
     pendiente_faltante: ['Pendiente', 'bg-amber-500/10 text-amber-400 border-amber-500/20'],
   };
   const [label, cls] = map[status] || ['Desconocido', 'bg-zinc-800 text-zinc-400 border-zinc-700'];
@@ -70,7 +70,7 @@ function DocumentRow({ doc, uploading, onUpload, onPreview }) {
           <button
             onClick={() => inputRef.current?.click()}
             disabled={isUploading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-zinc-700 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-zinc-700 text-zinc-400 hover:text-[#3D6332] hover:border-emerald-500/40 hover:bg-[#3D6332]/5 transition-all disabled:opacity-50"
           >
             {isUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
             {doc.status === 'cargado' ? 'Reemplazar' : 'Subir'}
@@ -203,7 +203,7 @@ export default function ArchivosPage() {
             {pendingCount > 0 ? (
               <AlertCircle size={15} className="text-amber-400" />
             ) : (
-              <CheckCircle2 size={15} className="text-emerald-400" />
+              <CheckCircle2 size={15} className="text-[#3D6332]" />
             )}
             <span className="text-sm font-medium text-zinc-300">
               {pendingCount > 0
@@ -215,7 +215,7 @@ export default function ArchivosPage() {
         </div>
         <div className="w-full bg-zinc-800 rounded-full h-2">
           <div
-            className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+            className="bg-[#3D6332] h-2 rounded-full transition-all duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -224,7 +224,7 @@ export default function ArchivosPage() {
 
       {/* Feedback messages */}
       {message && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#3D6332]/10 border border-[#3D6332]/20 text-[#3D6332] text-sm">
           <CheckCircle2 size={15} />
           {message}
           <button onClick={() => setMessage('')} className="ml-auto"><X size={14} /></button>

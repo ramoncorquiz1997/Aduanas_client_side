@@ -50,10 +50,10 @@ const REPORTS = [
 
 const COLOR = {
   emerald: {
-    card: 'border-emerald-500/20 bg-emerald-500/5',
-    icon: 'text-emerald-400 bg-emerald-400/10',
-    btn: 'bg-emerald-500 hover:bg-emerald-400 text-black',
-    btnOutline: 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10',
+    card: 'border-[#3D6332]/20 bg-[#3D6332]/5',
+    icon: 'text-[#3D6332] bg-[#3D6332]/10',
+    btn: 'bg-[#3D6332] hover:bg-[#33542A] text-white',
+    btnOutline: 'border-[#3D6332]/30 text-[#3D6332] hover:bg-[#3D6332]/10',
   },
   blue: {
     card: 'border-blue-500/20 bg-blue-500/5',
@@ -164,7 +164,7 @@ export default function ReportesPage() {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="bg-[#0d0d0d] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all [color-scheme:dark]"
+              className="bg-[#0d0d0d] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-[#3D6332]/50 focus:ring-1 focus:ring-[#3D6332]/20 transition-all [color-scheme:dark]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -173,7 +173,7 @@ export default function ReportesPage() {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="bg-[#0d0d0d] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all [color-scheme:dark]"
+              className="bg-[#0d0d0d] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-[#3D6332]/50 focus:ring-1 focus:ring-[#3D6332]/20 transition-all [color-scheme:dark]"
             />
           </div>
           <p className="text-xs text-zinc-600 pb-2">

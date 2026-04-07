@@ -25,7 +25,7 @@ function InfoField({ label, value, icon: Icon, mono }) {
       <div
         className={`
           bg-[#0d0d0d] border border-zinc-800 rounded-lg px-4 py-3 text-sm
-          ${mono ? 'font-mono text-emerald-400' : 'text-zinc-300'}
+          ${mono ? 'font-mono text-[#3D6332]' : 'text-zinc-300'}
           ${!value ? 'text-zinc-600 italic' : ''}
         `}
       >
@@ -125,8 +125,8 @@ export default function PerfilPage() {
 
       {/* Avatar */}
       <div className="flex items-center gap-5 rounded-xl border border-zinc-800/60 bg-[#111111] px-6 py-5">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-800/30 border border-emerald-500/20 flex items-center justify-center shrink-0">
-          <span className="text-2xl font-bold text-emerald-400">
+        <div className="w-16 h-16 rounded-2xl bg-[#3D6332]/15 border border-[#3D6332]/30 flex items-center justify-center shrink-0">
+          <span className="text-2xl font-bold text-[#3D6332]">
             {displayName.charAt(0).toUpperCase()}
           </span>
         </div>
@@ -137,7 +137,7 @@ export default function PerfilPage() {
             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border ${
               isCompany
                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : 'bg-[#3D6332]/10 text-[#3D6332] border-[#3D6332]/20'
             }`}>
               {isCompany !== undefined
                 ? (isCompany ? 'Persona Moral' : 'Persona Física')

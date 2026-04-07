@@ -70,12 +70,12 @@ function NavLink({ item, pathname, onClick }) {
       className={`
         flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
         ${isActive
-          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+          ? 'bg-[#3D6332]/10 text-[#3D6332] border border-[#3D6332]/20'
           : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5 border border-transparent'
         }
       `}
     >
-      <item.icon size={16} className={isActive ? 'text-emerald-400' : 'text-zinc-500'} />
+      <item.icon size={16} className={isActive ? 'text-[#3D6332]' : 'text-zinc-500'} />
       <span>{item.label}</span>
     </a>
   );
@@ -96,12 +96,12 @@ function NavGroup({ item, pathname, onNavigate }) {
         className={`
           w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
           ${isChildActive
-            ? 'text-emerald-400'
+            ? 'text-[#3D6332]'
             : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
           }
         `}
       >
-        <item.icon size={16} className={isChildActive ? 'text-emerald-400' : 'text-zinc-500'} />
+        <item.icon size={16} className={isChildActive ? 'text-[#3D6332]' : 'text-zinc-500'} />
         <span className="flex-1 text-left">{item.label}</span>
         {open
           ? <ChevronDown size={14} className="text-zinc-600" />
@@ -120,7 +120,7 @@ function NavGroup({ item, pathname, onNavigate }) {
                 className={`
                   flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150
                   ${isActive
-                    ? 'text-emerald-400 bg-emerald-500/5'
+                    ? 'text-[#3D6332] bg-[#3D6332]/5'
                     : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
                   }
                 `}
@@ -163,8 +163,8 @@ export default function Sidebar() {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-zinc-800/60">
-        <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-          <Anchor size={16} className="text-emerald-400" />
+        <div className="w-8 h-8 rounded-lg bg-[#3D6332]/15 border border-[#3D6332]/30 flex items-center justify-center">
+          <Anchor size={16} className="text-[#3D6332]" />
         </div>
         <div>
           <p className="text-sm font-semibold text-white tracking-wide">Aduanex</p>

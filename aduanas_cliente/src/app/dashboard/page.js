@@ -62,13 +62,13 @@ function buildMonthlyData(ops) {
 
 function StatCard({ title, value, sub, icon: Icon, color, trend }) {
   const colors = {
-    emerald: 'border-emerald-500/20 bg-emerald-500/5',
+    emerald: 'border-[#3D6332]/20 bg-[#3D6332]/5',
     blue: 'border-blue-500/20 bg-blue-500/5',
     amber: 'border-amber-500/20 bg-amber-500/5',
     purple: 'border-purple-500/20 bg-purple-500/5',
   };
   const iconColors = {
-    emerald: 'text-emerald-400 bg-emerald-400/10',
+    emerald: 'text-[#3D6332] bg-[#3D6332]/10',
     blue: 'text-blue-400 bg-blue-400/10',
     amber: 'text-amber-400 bg-amber-400/10',
     purple: 'text-purple-400 bg-purple-400/10',
@@ -86,7 +86,7 @@ function StatCard({ title, value, sub, icon: Icon, color, trend }) {
         </div>
       </div>
       <div className="flex items-center gap-2 text-xs text-zinc-500">
-        {trend === 'up' && <ArrowUpRight size={14} className="text-emerald-400" />}
+        {trend === 'up' && <ArrowUpRight size={14} className="text-[#3D6332]" />}
         {trend === 'down' && <ArrowDownRight size={14} className="text-red-400" />}
         <span>{sub}</span>
       </div>
@@ -111,7 +111,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 function OpStatusBadge({ stage }) {
   const label = stage?.[1] || stage || 'Sin etapa';
   const colors = {
-    ganado: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    ganado: 'bg-[#3D6332]/10 text-[#3D6332] border-[#3D6332]/20',
     perdido: 'bg-red-500/10 text-red-400 border-red-500/20',
   };
   const key = label.toLowerCase();
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                 <XAxis dataKey="mes" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="pedimentos" name="Pedimentos" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="pedimentos" name="Pedimentos" fill="#3D6332" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -280,9 +280,9 @@ export default function DashboardPage() {
                   type="monotone"
                   dataKey="acumulado"
                   name="Acumulado"
-                  stroke="#10b981"
+                  stroke="#3D6332"
                   strokeWidth={2}
-                  dot={{ fill: '#10b981', r: 3 }}
+                  dot={{ fill: '#3D6332', r: 3 }}
                   activeDot={{ r: 5 }}
                 />
               </LineChart>
@@ -304,7 +304,7 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={() => router.push('/dashboard/pedimentos')}
-            className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors"
+            className="text-xs text-[#3D6332] hover:text-[#4a7a3c] flex items-center gap-1 transition-colors"
           >
             Ver todas <ArrowUpRight size={12} />
           </button>
