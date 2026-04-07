@@ -19,31 +19,10 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    key: 'pedimentos',
-    label: 'Repositorio de Pedimentos',
-    href: '/dashboard/pedimentos',
-    icon: FileStack,
-  },
-  {
-    key: 'reportes',
-    label: 'Reportes',
-    href: '/dashboard/reportes',
-    icon: BarChart3,
-  },
-  {
-    key: 'archivos',
-    label: 'Mis Archivos',
-    href: '/dashboard/archivos',
-    icon: FolderOpen,
-  },
+  { key: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, exact: true },
+  { key: 'pedimentos', label: 'Repositorio de Pedimentos', href: '/dashboard/pedimentos', icon: FileStack },
+  { key: 'reportes', label: 'Reportes', href: '/dashboard/reportes', icon: BarChart3 },
+  { key: 'archivos', label: 'Mis Archivos', href: '/dashboard/archivos', icon: FolderOpen },
   {
     key: 'configuracion',
     label: 'Configuración',
@@ -56,26 +35,18 @@ const NAV_ITEMS = [
 ];
 
 function NavLink({ item, pathname, onClick }) {
-  const isActive = item.exact
-    ? pathname === item.href
-    : pathname.startsWith(item.href);
-
+  const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
   return (
     <a
       href={item.href}
-      onClick={(e) => {
-        e.preventDefault();
-        onClick(item.href);
-      }}
-      className={`
-        flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
-        ${isActive
-          ? 'bg-[#3D6332]/10 text-[#3D6332] border border-[#3D6332]/20'
-          : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5 border border-transparent'
-        }
-      `}
+      onClick={(e) => { e.preventDefault(); onClick(item.href); }}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+        isActive
+          ? 'bg-[#3D6332] text-white shadow-sm'
+          : 'text-slate-600 hover:bg-slate-100 hover:text-[#212121]'
+      }`}
     >
-      <item.icon size={16} className={isActive ? 'text-[#3D6332]' : 'text-zinc-500'} />
+      <item.icon size={16} className={isActive ? 'text-white' : 'text-slate-400'} />
       <span>{item.label}</span>
     </a>
   );
@@ -85,31 +56,22 @@ function NavGroup({ item, pathname, onNavigate }) {
   const isChildActive = item.children?.some((c) => pathname.startsWith(c.href));
   const [open, setOpen] = useState(isChildActive);
 
-  useEffect(() => {
-    if (isChildActive) setOpen(true);
-  }, [isChildActive]);
+  useEffect(() => { if (isChildActive) setOpen(true); }, [isChildActive]);
 
   return (
     <div>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`
-          w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
-          ${isChildActive
-            ? 'text-[#3D6332]'
-            : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
-          }
-        `}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+          isChildActive ? 'text-[#3D6332]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#212121]'
+        }`}
       >
-        <item.icon size={16} className={isChildActive ? 'text-[#3D6332]' : 'text-zinc-500'} />
+        <item.icon size={16} className={isChildActive ? 'text-[#3D6332]' : 'text-slate-400'} />
         <span className="flex-1 text-left">{item.label}</span>
-        {open
-          ? <ChevronDown size={14} className="text-zinc-600" />
-          : <ChevronRight size={14} className="text-zinc-600" />
-        }
+        {open ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
       </button>
       {open && (
-        <div className="ml-4 mt-1 space-y-0.5 border-l border-zinc-800 pl-3">
+        <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-slate-200 pl-3">
           {item.children.map((child) => {
             const isActive = pathname.startsWith(child.href);
             return (
@@ -117,15 +79,13 @@ function NavGroup({ item, pathname, onNavigate }) {
                 key={child.key}
                 href={child.href}
                 onClick={(e) => { e.preventDefault(); onNavigate(child.href); }}
-                className={`
-                  flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150
-                  ${isActive
-                    ? 'text-[#3D6332] bg-[#3D6332]/5'
-                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
-                  }
-                `}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
+                  isActive
+                    ? 'bg-[#3D6332] text-white'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-[#212121]'
+                }`}
               >
-                <child.icon size={14} />
+                <child.icon size={14} className={isActive ? 'text-white' : 'text-slate-400'} />
                 <span>{child.label}</span>
               </a>
             );
@@ -144,31 +104,24 @@ export default function Sidebar() {
 
   useEffect(() => {
     const session = localStorage.getItem('user_session');
-    if (session) {
-      try { setUser(JSON.parse(session)); } catch { /* ignore */ }
-    }
+    if (session) { try { setUser(JSON.parse(session)); } catch { } }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user_session');
-    router.push('/');
-  };
-
-  const handleNavigate = (href) => {
-    setMobileOpen(false);
-    router.push(href);
-  };
+  const handleLogout = () => { localStorage.removeItem('user_session'); router.push('/'); };
+  const handleNavigate = (href) => { setMobileOpen(false); router.push(href); };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-zinc-800/60">
-        <div className="w-8 h-8 rounded-lg bg-[#3D6332]/15 border border-[#3D6332]/30 flex items-center justify-center">
-          <Anchor size={16} className="text-[#3D6332]" />
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-200">
+        <div className="w-9 h-9 rounded-xl bg-[#3D6332] flex items-center justify-center shadow-sm">
+          <Anchor size={18} className="text-white" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-white tracking-wide">Aduanex</p>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Portal</p>
+          <p className="text-sm font-black text-[#212121] tracking-tight uppercase italic">
+            Aduan<span className="text-[#3D6332]">ex</span>
+          </p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest">Portal Logístico</p>
         </div>
       </div>
 
@@ -184,17 +137,17 @@ export default function Sidebar() {
       </nav>
 
       {/* User */}
-      <div className="px-3 py-4 border-t border-zinc-800/60 space-y-1">
+      <div className="px-3 py-4 border-t border-slate-200 space-y-1">
         {user && (
-          <div className="px-4 py-2.5 mb-2">
-            <p className="text-xs text-zinc-500 uppercase tracking-wider mb-0.5">Sesión</p>
-            <p className="text-sm font-medium text-zinc-200 truncate">{user.name}</p>
-            <p className="text-xs text-zinc-500 font-mono">{user.rfc}</p>
+          <div className="px-3 py-2.5 mb-2 bg-slate-50 rounded-lg border border-slate-200">
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Sesión activa</p>
+            <p className="text-sm font-semibold text-[#212121] truncate">{user.name}</p>
+            <p className="text-xs text-slate-400 font-mono">{user.rfc}</p>
           </div>
         )}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all border border-transparent hover:border-red-500/20"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
         >
           <LogOut size={16} />
           <span>Cerrar sesión</span>
@@ -205,41 +158,29 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile toggle button */}
+      {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border border-slate-200 text-slate-500 shadow-sm"
       >
         <Menu size={18} />
       </button>
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
+        <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
       )}
 
       {/* Mobile drawer */}
-      <aside
-        className={`
-          lg:hidden fixed top-0 left-0 h-full w-64 z-50 bg-[#0d0d0d] border-r border-zinc-800/60
-          transform transition-transform duration-200
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
-      >
-        <button
-          onClick={() => setMobileOpen(false)}
-          className="absolute top-4 right-4 p-1.5 rounded-md text-zinc-500 hover:text-zinc-300"
-        >
+      <aside className={`lg:hidden fixed top-0 left-0 h-full w-64 z-50 bg-white border-r border-slate-200 transform transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 p-1.5 rounded-md text-slate-400 hover:text-slate-600">
           <X size={16} />
         </button>
         <SidebarContent />
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 bg-[#0d0d0d] border-r border-zinc-800/60">
+      <aside className="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 bg-white border-r border-slate-200">
         <SidebarContent />
       </aside>
     </>

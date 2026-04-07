@@ -6,8 +6,7 @@ export const metadata = {
 
 export default function DashboardLayout({ children }) {
   return (
-    // Force dark class so all dark: variants apply regardless of system preference
-    <div className="dark flex min-h-screen bg-[#0a0a0a] text-white">
+    <div className="flex min-h-screen bg-slate-50 text-[#212121]">
       <Sidebar />
       <main className="flex-1 min-w-0 overflow-x-hidden">
         {children}
