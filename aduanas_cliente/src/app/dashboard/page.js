@@ -2,30 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   FileText,
-  TrendingUp,
   Package,
-  Users,
   ArrowUpRight,
-  ArrowDownRight,
   Clock,
   CheckCircle2,
   AlertCircle,
   RefreshCw,
+  ArrowDownRight,
 } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+
+// Dynamically import charts to avoid SSR issues with recharts (uses window/document)
+const MonthlyBarChart = dynamic(
+  () => import('../../components/DashboardCharts').then((m) => m.MonthlyBarChart),
+  { ssr: false, loading: () => <div className="h-[220px] flex items-center justify-center text-zinc-700 text-xs">Cargando gráfica…</div> }
+);
+const CumulativeLineChart = dynamic(
+  () => import('../../components/DashboardCharts').then((m) => m.CumulativeLineChart),
+  { ssr: false, loading: () => <div className="h-[220px] flex items-center justify-center text-zinc-700 text-xs">Cargando gráfica…</div> }
+);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -93,20 +90,6 @@ function StatCard({ title, value, sub, icon: Icon, color, trend }) {
     </div>
   );
 }
-
-const CustomTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-[#1a1a1a] border border-zinc-800 rounded-lg px-3 py-2 text-xs shadow-xl">
-      <p className="text-zinc-400 mb-1">{label}</p>
-      {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color }} className="font-medium">
-          {p.name}: {p.value}
-        </p>
-      ))}
-    </div>
-  );
-};
 
 function OpStatusBadge({ stage }) {
   const label = stage?.[1] || stage || 'Sin etapa';
@@ -237,61 +220,20 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Bar chart - movimiento mensual */}
         <div className="rounded-xl border border-zinc-800/60 bg-[#111111] p-5">
           <div className="mb-5">
             <h2 className="text-sm font-semibold text-white">Movimiento Mensual</h2>
             <p className="text-xs text-zinc-500 mt-0.5">Pedimentos por mes (últimos 6 meses)</p>
           </div>
-          {monthlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={monthlyData} barSize={28}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e1e1e" vertical={false} />
-                <XAxis dataKey="mes" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="pedimentos" name="Pedimentos" fill="#3D6332" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[220px] flex items-center justify-center text-zinc-600 text-sm">
-              Sin datos suficientes para graficar
-            </div>
-          )}
+          <MonthlyBarChart data={monthlyData} />
         </div>
 
-        {/* Line chart - tendencia acumulada */}
         <div className="rounded-xl border border-zinc-800/60 bg-[#111111] p-5">
           <div className="mb-5">
             <h2 className="text-sm font-semibold text-white">Tendencia Acumulada</h2>
             <p className="text-xs text-zinc-500 mt-0.5">Pedimentos acumulados por mes</p>
           </div>
-          {monthlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={monthlyData.map((d, i) => ({
-                ...d,
-                acumulado: monthlyData.slice(0, i + 1).reduce((s, x) => s + x.pedimentos, 0),
-              }))}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e1e1e" vertical={false} />
-                <XAxis dataKey="mes" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
-                  type="monotone"
-                  dataKey="acumulado"
-                  name="Acumulado"
-                  stroke="#3D6332"
-                  strokeWidth={2}
-                  dot={{ fill: '#3D6332', r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[220px] flex items-center justify-center text-zinc-600 text-sm">
-              Sin datos suficientes para graficar
-            </div>
-          )}
+          <CumulativeLineChart data={monthlyData} />
         </div>
       </div>
 
