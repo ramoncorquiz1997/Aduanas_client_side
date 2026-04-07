@@ -7,7 +7,7 @@ export async function POST(request) {
 
     const config = {
       url: 'http://127.0.0.1:8069', 
-      db: 'odoo18',
+      db: 'aduanex_pro_v1',
       username: 'admin', // Asegúrate que este usuario tenga permisos sobre res.partner
       password: '50e07cd9a97f6a3c0ef3c7c0412be1c995591c73',
     };
