@@ -4,25 +4,16 @@ const ODOO_URL = 'http://127.0.0.1:8069';
 
 /**
  * POST /api/auth/register
- * Body: {
- *   name: string,
- *   email: string,
- *   phone: string,
- *   password: string,
- *   rfc: string,          <- extraído del CSF
- *   csf_b64: string,      <- PDF del CSF en base64
- *   csf_filename: string,
- * }
+ * Body: { name, email, phone, password, rfc, csf_b64, csf_filename }
  *
- * Llama al controlador de Odoo /portal/register para crear el res.partner
- * con estado "pending". La agencia aprueba desde Odoo.
+ * Llama al controlador público de Odoo /portal/register (type=json)
+ * para crear el res.partner con estado "pending".
  */
 export async function POST(request) {
   try {
     const body = await request.json();
     const { name, email, phone, password, rfc, csf_b64, csf_filename } = body;
 
-    // Validaciones básicas en el servidor
     if (!name || !email || !phone || !password || !rfc || !csf_b64) {
       return NextResponse.json({ error: 'Todos los campos son requeridos' }, { status: 400 });
     }
@@ -36,7 +27,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'El correo electrónico no es válido' }, { status: 400 });
     }
 
-    // Llamar al endpoint de Odoo vía HTTP JSON-RPC público
+    // El controlador Odoo usa type='json' → espera formato JSON-RPC 2.0
     const odooResponse = await fetch(`${ODOO_URL}/portal/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,13 +48,14 @@ export async function POST(request) {
     });
 
     if (!odooResponse.ok) {
+      console.error('Odoo register HTTP error:', odooResponse.status);
       return NextResponse.json({ error: 'Error al conectar con el servidor' }, { status: 502 });
     }
 
     const odooData = await odooResponse.json();
 
     if (odooData.error) {
-      console.error('Odoo register error:', JSON.stringify(odooData.error));
+      console.error('Odoo register RPC error:', JSON.stringify(odooData.error));
       return NextResponse.json({ error: 'Error en el servidor al registrar' }, { status: 500 });
     }
 
