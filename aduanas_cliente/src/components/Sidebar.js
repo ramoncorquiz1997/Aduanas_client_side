@@ -16,13 +16,27 @@ import {
   Anchor,
   X,
   Menu,
+  Users,
 } from 'lucide-react';
 
-const NAV_ITEMS = [
+const NAV_ITEMS_CLIENT = [
   { key: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, exact: true },
   { key: 'pedimentos', label: 'Repositorio de Pedimentos', href: '/dashboard/pedimentos', icon: FileStack },
   { key: 'reportes', label: 'Reportes', href: '/dashboard/reportes', icon: BarChart3 },
   { key: 'archivos', label: 'Mis Archivos', href: '/dashboard/archivos', icon: FolderOpen },
+  {
+    key: 'configuracion',
+    label: 'Configuración',
+    icon: Settings,
+    children: [
+      { key: 'perfil', label: 'Perfil', href: '/dashboard/configuracion/perfil', icon: User },
+      { key: 'seguridad', label: 'Seguridad', href: '/dashboard/configuracion/seguridad', icon: ShieldCheck },
+    ],
+  },
+];
+
+const NAV_ITEMS_FF = [
+  { key: 'mis-clientes', label: 'Mis Clientes', href: '/dashboard/mis-clientes', icon: Users, exact: true },
   {
     key: 'configuracion',
     label: 'Configuración',
@@ -101,10 +115,17 @@ export default function Sidebar() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navItems, setNavItems] = useState(NAV_ITEMS_CLIENT);
 
   useEffect(() => {
     const session = localStorage.getItem('user_session');
-    if (session) { try { setUser(JSON.parse(session)); } catch { } }
+    if (session) {
+      try {
+        const u = JSON.parse(session);
+        setUser(u);
+        setNavItems(u.role === 'freight_forwarder' ? NAV_ITEMS_FF : NAV_ITEMS_CLIENT);
+      } catch { }
+    }
   }, []);
 
   const handleLogout = () => { localStorage.removeItem('user_session'); router.push('/'); };
@@ -127,7 +148,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map((item) =>
+        {navItems.map((item) =>
           item.children ? (
             <NavGroup key={item.key} item={item} pathname={pathname} onNavigate={handleNavigate} />
           ) : (
@@ -143,6 +164,11 @@ export default function Sidebar() {
             <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Sesión activa</p>
             <p className="text-sm font-semibold text-[#212121] truncate">{user.name}</p>
             <p className="text-xs text-slate-400 font-mono">{user.rfc}</p>
+            {user.role === 'freight_forwarder' && (
+              <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest bg-[#3D6332]/10 text-[#3D6332] px-2 py-0.5 rounded-full">
+                Freight Forwarder
+              </span>
+            )}
           </div>
         )}
         <button
