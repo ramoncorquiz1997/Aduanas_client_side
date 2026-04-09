@@ -52,7 +52,7 @@ export async function POST(request) {
           [[partnerId], { x_csf_file: fileBase64, x_csf_filename: originalFileName }],
         ], (writeError, writeOk) => {
           if (writeError || !writeOk) {
-            return resolve(NextResponse.json({ error: 'No se pudo guardar el CSF en Odoo' }, { status: 500 }));
+            return resolve(NextResponse.json({ error: 'No se pudo guardar el CSF' }, { status: 500 }));
           }
 
           return resolve(NextResponse.json({ success: true }));

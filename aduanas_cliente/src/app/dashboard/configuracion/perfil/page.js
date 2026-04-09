@@ -125,7 +125,7 @@ export default function PerfilPage() {
       </div>
 
       <div className="bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-xs text-slate-400 leading-relaxed">
-        <span className="font-bold text-slate-500">Nota:</span> Para actualizar tus datos contacta directamente con tu agente aduanal. Los datos son administrados desde Odoo.
+        <span className="font-bold text-slate-500">Nota:</span> Para actualizar tus datos contacta directamente con tu agente aduanal. Los datos son administrados desde el portal de la agencia.
       </div>
     </div>
   );

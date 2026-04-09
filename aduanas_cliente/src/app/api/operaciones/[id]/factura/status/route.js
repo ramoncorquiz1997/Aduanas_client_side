@@ -22,7 +22,7 @@ function authenticate(common) {
       [ODOO_CONFIG.db, ODOO_CONFIG.username, ODOO_CONFIG.password, {}],
       (error, uid) => {
         if (error || !uid) {
-          reject(new Error('No se pudo autenticar en Odoo'));
+          reject(new Error('Error de autenticación en el servidor'));
           return;
         }
         resolve(uid);

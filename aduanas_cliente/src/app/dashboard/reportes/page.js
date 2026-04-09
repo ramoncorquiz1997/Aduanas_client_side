@@ -97,10 +97,6 @@ export default function ReportesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {REPORTS.map(r => <ReportCard key={r.key} report={r} onDownload={handleDownload} downloading={downloading} />)}
       </div>
-
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-xs text-slate-400 leading-relaxed">
-        <span className="font-bold text-slate-500">Nota:</span> Los reportes se generan en tiempo real consultando los datos en Odoo. Para grandes volúmenes puede tardar unos segundos.
-      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export async function POST(request) {
 
       common.methodCall('authenticate', [config.db, config.username, config.password, {}], (error, uid) => {
         if (error || !uid || typeof uid !== 'number') {
-          console.error('Error Auth Odoo:', error || 'UID Inválido');
+          console.error('Error Auth:', error || 'UID Inválido');
           return resolve(NextResponse.json({ error: 'Fallo de autenticación sistema' }, { status: 500 }));
         }
 

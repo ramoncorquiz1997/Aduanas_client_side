@@ -96,7 +96,7 @@ export async function POST(request) {
           [[partnerId], { [fileField]: fileBase64, [filenameField]: originalFileName }],
         ], (writeError, writeOk) => {
           if (writeError || !writeOk) {
-            return resolve(NextResponse.json({ error: 'No se pudo guardar el documento en Odoo' }, { status: 500 }));
+            return resolve(NextResponse.json({ error: 'No se pudo guardar el documento. Intenta de nuevo.' }, { status: 500 }));
           }
 
           return resolve(NextResponse.json({ success: true }));

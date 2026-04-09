@@ -33,7 +33,7 @@ function authenticate(common) {
       [ODOO_CONFIG.db, ODOO_CONFIG.username, ODOO_CONFIG.password, {}],
       (error, uid) => {
         if (error || !uid) {
-          reject(new Error('No se pudo autenticar en Odoo'));
+          reject(new Error('Error de autenticación en el servidor'));
           return;
         }
         resolve(uid);
@@ -115,7 +115,7 @@ export async function POST(request, context) {
     );
 
     if (!ok) {
-      return NextResponse.json({ error: 'No se pudo guardar factura en Odoo' }, { status: 500 });
+      return NextResponse.json({ error: 'No se pudo guardar la factura. Intenta de nuevo.' }, { status: 500 });
     }
 
     return NextResponse.json({
