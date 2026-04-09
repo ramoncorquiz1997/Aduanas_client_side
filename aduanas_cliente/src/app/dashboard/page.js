@@ -78,6 +78,7 @@ export default function DashboardPage() {
     const session = localStorage.getItem('user_session');
     if (!session) { router.push('/'); return; }
     const u = JSON.parse(session);
+    if (u.role === 'freight_forwarder') { router.push('/dashboard/mis-clientes'); return; }
     setUser(u);
     fetchOps(u.id);
   }, [router]);

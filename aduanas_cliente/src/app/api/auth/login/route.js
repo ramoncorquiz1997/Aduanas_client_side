@@ -27,7 +27,7 @@ export async function POST(request) {
           config.db, uid, config.password,
           'res.partner', 'search_read',
           [[['vat', '=', rfc.trim().toUpperCase()]]],
-          { fields: ['name', 'vat', 'email', 'id', 'x_portal_password', 'x_portal_status'], limit: 1 }
+          { fields: ['name', 'vat', 'email', 'id', 'x_portal_password', 'x_portal_status', 'x_contact_role'], limit: 1 }
         ], (err, partners) => {
           if (err || !partners || partners.length === 0) {
             return resolve(NextResponse.json({ error: 'RFC no encontrado' }, { status: 401 }));
@@ -65,9 +65,11 @@ export async function POST(request) {
             return resolve(NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 }));
           }
 
+          const role = user.x_contact_role === 'freight_forwarder' ? 'freight_forwarder' : 'client';
+
           return resolve(NextResponse.json({
             success: true,
-            user: { id: user.id, name: user.name, rfc: user.vat }
+            user: { id: user.id, name: user.name, rfc: user.vat, role }
           }));
         });
       });
