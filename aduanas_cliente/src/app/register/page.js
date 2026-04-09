@@ -97,7 +97,8 @@ export default function Register() {
 
       setCsfFile(file);
       setCsfB64(b64);
-      setExtractedRfc(data.data.vat);
+      // El RFC puede venir en 'vat' (del modelo Odoo) o ser extraído via regex
+      setExtractedRfc(data.data?.vat || '');
       setStep(STEPS.DATOS);
     } catch {
       setCsfError('Error al procesar el archivo. Inténtalo de nuevo.');
@@ -137,6 +138,10 @@ export default function Register() {
     }
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
       setFormError('Todos los campos son requeridos.');
+      return;
+    }
+    if (!extractedRfc.trim() || extractedRfc.trim().length < 12) {
+      setFormError('Ingresa un RFC válido (12 o 13 caracteres).');
       return;
     }
 
@@ -282,20 +287,32 @@ export default function Register() {
               <h2 className="text-lg font-black text-[#212121] dark:text-white">Completa tus datos</h2>
             </div>
 
-            {/* RFC extraído */}
-            <div className="flex items-center gap-3 bg-[#3D6332]/8 dark:bg-[#3D6332]/15 border border-[#3D6332]/20 rounded-2xl px-4 py-3 mb-6">
-              <CheckCircle size={18} className="text-[#3D6332] shrink-0" />
-              <div>
-                <p className="text-[9px] font-black text-[#3D6332] uppercase tracking-widest">RFC extraído del CSF</p>
-                <p className="text-sm font-black text-[#212121] dark:text-white">{extractedRfc}</p>
+            {/* RFC — editable si no se extrajo automáticamente */}
+            <div className={`rounded-2xl px-4 py-3 mb-6 border ${extractedRfc ? 'bg-[#3D6332]/8 dark:bg-[#3D6332]/15 border-[#3D6332]/20' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'}`}>
+              <div className="flex items-center gap-2 mb-2">
+                {extractedRfc
+                  ? <CheckCircle size={16} className="text-[#3D6332] shrink-0" />
+                  : <AlertCircle size={16} className="text-amber-500 shrink-0" />
+                }
+                <p className={`text-[9px] font-black uppercase tracking-widest ${extractedRfc ? 'text-[#3D6332]' : 'text-amber-600 dark:text-amber-400'}`}>
+                  {extractedRfc ? 'RFC extraído del CSF' : 'No se detectó el RFC — ingrésalo manualmente'}
+                </p>
+                <button
+                  onClick={() => { setStep(STEPS.CSF); setCsfFile(null); setCsfB64(''); setExtractedRfc(''); }}
+                  className="ml-auto text-slate-400 hover:text-red-400 transition-colors"
+                  title="Cambiar CSF"
+                >
+                  <X size={16} />
+                </button>
               </div>
-              <button
-                onClick={() => { setStep(STEPS.CSF); setCsfFile(null); setCsfB64(''); setExtractedRfc(''); }}
-                className="ml-auto text-slate-400 hover:text-red-400 transition-colors"
-                title="Cambiar CSF"
-              >
-                <X size={16} />
-              </button>
+              <input
+                type="text"
+                value={extractedRfc}
+                onChange={(e) => setExtractedRfc(e.target.value.toUpperCase())}
+                placeholder="XAXX010101000"
+                maxLength={13}
+                className="w-full bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-black uppercase text-[#212121] dark:text-white outline-none focus:border-[#3D6332] transition-colors"
+              />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
