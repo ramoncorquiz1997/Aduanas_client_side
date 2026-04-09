@@ -164,9 +164,18 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Soporte */}
-          <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[11px] text-slate-500 font-bold text-center uppercase tracking-tighter">
+          {/* Crear cuenta */}
+          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
+            <p className="text-[10px] text-slate-400 font-black text-center uppercase tracking-widest">
+              ¿Eres cliente nuevo?
+            </p>
+            <a
+              href="/register"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-[#3D6332] text-[#3D6332] font-black text-xs uppercase tracking-[0.15em] hover:bg-[#3D6332] hover:text-white active:scale-[0.97] transition-all"
+            >
+              Crear cuenta
+            </a>
+            <p className="text-[11px] text-slate-500 font-bold text-center uppercase tracking-tighter pt-1">
               ¿Problemas con el acceso? <a href="#" className="text-[#3D6332] hover:underline">Contactar a TI</a>
             </p>
           </div>
