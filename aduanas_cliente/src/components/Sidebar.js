@@ -19,24 +19,12 @@ import {
   Users,
 } from 'lucide-react';
 
-const NAV_ITEMS_CLIENT = [
+const NAV_ITEMS_BASE = [
   { key: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, exact: true },
+  { key: 'mis-clientes', label: 'Mis Clientes', href: '/dashboard/mis-clientes', icon: Users, ffOnly: true },
   { key: 'pedimentos', label: 'Repositorio de Pedimentos', href: '/dashboard/pedimentos', icon: FileStack },
   { key: 'reportes', label: 'Reportes', href: '/dashboard/reportes', icon: BarChart3 },
   { key: 'archivos', label: 'Mis Archivos', href: '/dashboard/archivos', icon: FolderOpen },
-  {
-    key: 'configuracion',
-    label: 'Configuración',
-    icon: Settings,
-    children: [
-      { key: 'perfil', label: 'Perfil', href: '/dashboard/configuracion/perfil', icon: User },
-      { key: 'seguridad', label: 'Seguridad', href: '/dashboard/configuracion/seguridad', icon: ShieldCheck },
-    ],
-  },
-];
-
-const NAV_ITEMS_FF = [
-  { key: 'mis-clientes', label: 'Mis Clientes', href: '/dashboard/mis-clientes', icon: Users, exact: true },
   {
     key: 'configuracion',
     label: 'Configuración',
@@ -115,7 +103,7 @@ export default function Sidebar() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [navItems, setNavItems] = useState(NAV_ITEMS_CLIENT);
+  const [isFF, setIsFF] = useState(false);
 
   useEffect(() => {
     const session = localStorage.getItem('user_session');
@@ -123,10 +111,12 @@ export default function Sidebar() {
       try {
         const u = JSON.parse(session);
         setUser(u);
-        setNavItems(u.role === 'freight_forwarder' ? NAV_ITEMS_FF : NAV_ITEMS_CLIENT);
+        setIsFF(u.role === 'freight_forwarder');
       } catch { }
     }
   }, []);
+
+  const navItems = NAV_ITEMS_BASE.filter((item) => !item.ffOnly || isFF);
 
   const handleLogout = () => { localStorage.removeItem('user_session'); router.push('/'); };
   const handleNavigate = (href) => { setMobileOpen(false); router.push(href); };
