@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server';
+const xmlrpc = require('xmlrpc');
 
-const ODOO_URL = 'http://127.0.0.1:8069';
+const config = {
+  url: 'http://127.0.0.1:8069',
+  db: 'aduanex_pro_v1',
+  username: 'admin',
+  password: '50e07cd9a97f6a3c0ef3c7c0412be1c995591c73',
+};
 
 /**
  * POST /api/auth/extract-csf
- * Body: { file_b64: string }   <- PDF del CSF codificado en base64
+ * Body: { file_b64: string }
  *
- * Llama al controlador público de Odoo /portal/extract-csf (type=json)
- * y retorna los valores extraídos del QR del CSF (RFC, CURP, domicilio, etc.)
+ * Llama a res.partner.portal_extract_csf() vía XML-RPC para extraer
+ * el RFC y datos fiscales del QR del CSF.
  */
 export async function POST(request) {
   try {
@@ -17,44 +23,39 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No se recibió el archivo' }, { status: 400 });
     }
 
-    // El controlador Odoo usa type='json' → espera formato JSON-RPC 2.0
-    const odooResponse = await fetch(`${ODOO_URL}/portal/extract-csf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'call',
-        id: 1,
-        params: { file_b64 },
-      }),
+    return new Promise((resolve) => {
+      const common = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/common` });
+
+      common.methodCall('authenticate', [config.db, config.username, config.password, {}], (authErr, uid) => {
+        if (authErr || !uid || typeof uid !== 'number') {
+          console.error('extract-csf auth error:', authErr);
+          return resolve(NextResponse.json({ error: 'Error de autenticación con el servidor' }, { status: 500 }));
+        }
+
+        const models = xmlrpc.createClient({ url: `${config.url}/xmlrpc/2/object` });
+
+        models.methodCall('execute_kw', [
+          config.db, uid, config.password,
+          'res.partner', 'portal_extract_csf',
+          [file_b64],
+          {},
+        ], (err, result) => {
+          if (err) {
+            console.error('extract-csf xmlrpc error:', err.message || err);
+            return resolve(NextResponse.json({ error: 'Error procesando el CSF en el servidor' }, { status: 500 }));
+          }
+
+          if (!result || Object.keys(result).length === 0) {
+            return resolve(NextResponse.json(
+              { error: 'No se pudo leer el QR del CSF. Verifica que sea el PDF original del SAT.' },
+              { status: 422 }
+            ));
+          }
+
+          resolve(NextResponse.json({ success: true, data: result }));
+        });
+      });
     });
-
-    if (!odooResponse.ok) {
-      console.error('Odoo extract-csf HTTP error:', odooResponse.status);
-      return NextResponse.json({ error: 'Error al conectar con el servidor de extracción' }, { status: 502 });
-    }
-
-    const odooData = await odooResponse.json();
-
-    if (odooData.error) {
-      console.error('Odoo extract-csf RPC error:', JSON.stringify(odooData.error));
-      return NextResponse.json({ error: 'El servidor no pudo procesar el CSF' }, { status: 422 });
-    }
-
-    const result = odooData.result;
-
-    if (result?.error) {
-      return NextResponse.json({ error: result.error }, { status: 422 });
-    }
-
-    if (!result?.data || Object.keys(result.data).length === 0) {
-      return NextResponse.json(
-        { error: 'No se pudo leer el QR del CSF. Verifica que el PDF sea el original del SAT.' },
-        { status: 422 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data: result.data });
   } catch (err) {
     console.error('extract-csf route error:', err);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
