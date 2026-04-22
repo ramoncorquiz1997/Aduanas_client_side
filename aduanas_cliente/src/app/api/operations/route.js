@@ -11,7 +11,7 @@ export async function GET(request) {
     url: 'http://127.0.0.1:8069',
     db: 'aduanex_pro_v1',
     username: 'admin',
-    password: 'c7923b5f112e5d26bbb25818cc226596077e2c56',
+    password: '50e07cd9a97f6a3c0ef3c7c0412be1c995591c73',
   };
 
   return new Promise((resolve) => {
