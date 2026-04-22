@@ -3,7 +3,7 @@ const xmlrpc = require('xmlrpc');
 
 const config = {
   url: 'http://127.0.0.1:8069',
-  db: 'odoo18',
+  db: 'aduanex_pro_v1',
   username: 'admin',
   password: 'c7923b5f112e5d26bbb25818cc226596077e2c56',
 };
